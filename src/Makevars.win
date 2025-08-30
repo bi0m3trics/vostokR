@@ -1,0 +1,15 @@
+CXX_STD = CXX17
+
+PKG_CPPFLAGS = -I. -Ioctree -Isolpos -fopenmp
+PKG_LIBS = -fopenmp -lgomp
+
+OBJECTS = RcppExports.o \
+          rcpp_interface.o \
+          IrradianceCalc.o \
+          ShadowCalc.o \
+          Vec3d.o \
+          solpos/solpos.o \
+          octree/Octree.o \
+          octree/OctreeNode.o \
+          octree/OctreeNodeInfo.o \
+          pointCloud/AbstractPointCloud.o

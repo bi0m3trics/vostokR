@@ -1,0 +1,282 @@
+---
+title: "Solar Potential Analysis with vostokR"
+author: "Andrew Sánchez Meador"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Solar Potential Analysis with vostokR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Introduction
+
+The `vostokR` package provides R bindings for the VOSTOK (Viewshed Obstruction by Solar Tracking with Octree Knowledge) solar potential analysis toolkit. VOSTOK uses 3D point cloud data to calculate solar irradiance potential by accounting for shadowing effects from surrounding vegetation and terrain features.
+
+This package enables researchers and practitioners to:
+
+- Calculate solar potential on LiDAR point clouds
+- Generate solar potential raster maps
+- Account for topographic and vegetation shadowing
+- Support flexible temporal analysis periods
+- Integrate seamlessly with the R spatial ecosystem
+
+## Installation
+
+```{r eval=FALSE}
+# Install development version from source
+# (assuming package is already built and available)
+install.packages("path/to/vostokR", repos = NULL, type = "source")
+```
+
+## Loading Required Packages
+
+```{r setup, message=FALSE, warning=FALSE}
+library(vostokR)
+library(lidR)
+library(terra)
+library(sf)
+```
+
+## Basic Workflow
+
+### 1. Loading and Preparing LiDAR Data
+
+First, load your LiDAR data and add surface normals, which are required for the solar potential calculations:
+
+```{r eval=FALSE}
+# Load LiDAR data
+LASfile <- "path/to/your/lidar/data.laz"
+las <- readLAS(LASfile)
+
+# Add surface normals (required for solar calculations)
+las <- add_normals(las, k = 10)
+```
+
+For this demonstration, we'll use the included test data:
+
+```{r}
+# Load test data included with the package
+LASfile <- system.file('extdata', 'test.laz', package='vostokR')
+las <- readLAS(LASfile)
+
+# Display basic information about the point cloud
+print(las)
+```
+
+```{r}
+# Add surface normals
+las <- add_normals(las, k = 10)
+```
+
+### 2. Calculating Solar Potential
+
+The main function `calculate_solar_potential()` computes solar irradiance for each point in the cloud, accounting for shadowing effects:
+
+```{r}
+# Calculate solar potential for a specific time period
+# Using a subset for faster processing in this example
+las_small <- filter_poi(las, X < min(X) + 50 & Y < min(Y) + 50)
+
+las_solar <- calculate_solar_potential(
+  las_small,
+  year = 2025,
+  start_date = '2025-06-15',  # Summer solstice period
+  end_date = '2025-06-17',
+  day_step = 1,               # Calculate every day
+  minute_step = 60,           # Every hour
+  min_sun_angle = 10,         # Minimum solar elevation angle
+  voxel_size = 1.0           # Voxel resolution for octree
+)
+```
+
+The function automatically detects the coordinate system and extracts the appropriate latitude, longitude, and timezone for solar position calculations.
+
+### 3. Examining Results
+
+After calculation, each point has a new `solar_potential` attribute containing the annual solar irradiance in kWh/m²/year:
+
+```{r}
+# Check the range of solar potential values
+summary(las_solar$solar_potential)
+```
+
+```{r}
+# Visualize the solar potential on the point cloud
+plot(las_solar, color = "solar_potential", bg = "white")
+```
+
+### 4. Creating Solar Potential Rasters
+
+Generate raster maps to visualize spatial patterns of solar potential:
+
+```{r}
+# Create a ground-level solar potential raster
+ground_raster <- solar_ground_raster(las_solar, res = 2.0)
+
+if (!is.null(ground_raster)) {
+  print(ground_raster)
+  plot(ground_raster, main = "Ground Solar Potential (kWh/m²/year)")
+}
+```
+
+If no ground points are classified in your data, use all points:
+
+```{r}
+# Alternative: use all points for raster creation
+all_points_raster <- solar_ground_raster(las_solar, res = 2.0, use_all_points = TRUE)
+plot(all_points_raster, main = "Solar Potential - All Points (kWh/m²/year)")
+```
+
+## Advanced Usage
+
+### Custom Date Ranges
+
+Analyze solar potential for specific seasons or periods:
+
+```{r eval=FALSE}
+# Spring analysis
+spring_solar <- calculate_solar_potential(
+  las,
+  year = 2025,
+  start_date = '2025-03-20',  # Spring equinox
+  end_date = '2025-06-20',    # Summer solstice
+  day_step = 7,               # Weekly sampling
+  minute_step = 120,          # Every 2 hours
+  voxel_size = 1.5
+)
+
+# Winter analysis  
+winter_solar <- calculate_solar_potential(
+  las,
+  year = 2025,
+  start_date = '2025-12-21',  # Winter solstice
+  end_date = '2025-12-22',    # Single day
+  day_step = 1,
+  minute_step = 30,           # Every 30 minutes
+  voxel_size = 1.0
+)
+```
+
+### Parameter Sensitivity
+
+Key parameters that affect computation time and accuracy:
+
+- **`voxel_size`**: Smaller values = higher accuracy but longer computation time
+- **`minute_step`**: Smaller values = more temporal samples but longer computation time
+- **`min_sun_angle`**: Higher values = exclude low-angle sun positions
+- **`day_step`**: For long periods, use larger steps to reduce computation time
+
+### Working with Large Datasets
+
+For large point clouds, consider processing in chunks:
+
+```{r eval=FALSE}
+# Process large datasets using lidR catalog
+ctg <- readLAScatalog("path/to/large/dataset/")
+
+# Set processing options
+opt_chunk_size(ctg) <- 200  # 200m chunks
+opt_chunk_buffer(ctg) <- 50 # 50m buffer
+
+# Process with catalog
+solar_results <- catalog_apply(ctg, function(chunk) {
+  chunk <- add_normals(chunk, k = 10)
+  calculate_solar_potential(
+    chunk,
+    year = 2025,
+    start_date = '2025-06-15',
+    end_date = '2025-06-17',
+    voxel_size = 2.0
+  )
+})
+```
+
+## Integration with Other Packages
+
+### Working with sf and terra
+
+```{r eval=FALSE}
+# Convert raster to sf for further analysis
+raster_sf <- as.polygons(ground_raster, dissolve = FALSE) |> st_as_sf()
+
+# Perform spatial operations
+high_potential <- raster_sf[raster_sf$V1 > 8000, ]  # Areas with >8000 kWh/m²/year
+
+# Export results
+writeVector(vect(high_potential), "high_solar_potential.shp")
+writeRaster(ground_raster, "solar_potential.tif")
+```
+
+### Statistical Analysis
+
+```{r eval=FALSE}
+# Extract solar potential values for analysis
+solar_values <- las_solar$solar_potential
+
+# Basic statistics
+mean_solar <- mean(solar_values, na.rm = TRUE)
+sd_solar <- sd(solar_values, na.rm = TRUE)
+
+# Identify high-potential areas
+threshold <- mean_solar + sd_solar
+high_potential_points <- filter_poi(las_solar, solar_potential > threshold)
+```
+
+## Technical Details
+
+### VOSTOK Algorithm
+
+The VOSTOK toolkit implements a sophisticated ray-casting algorithm that:
+
+1. **Builds an octree** spatial index of the 3D point cloud for efficient shadowing calculations
+2. **Calculates solar positions** using the SOLPOS algorithm for precise sun position tracking
+3. **Performs ray casting** from each point toward the sun to detect shadowing obstacles
+4. **Accumulates irradiance** over the specified time period, accounting for atmospheric conditions
+
+### Coordinate System Handling
+
+The package automatically:
+
+- Detects coordinate reference systems from LAS files
+- Extracts geographic coordinates (latitude/longitude)
+- Determines appropriate timezone based on longitude
+- Handles coordinate transformations as needed
+
+### Performance Considerations
+
+Computation time depends on:
+
+- **Point cloud size**: Linear relationship with number of points
+- **Temporal resolution**: More time samples = longer computation
+- **Voxel size**: Smaller voxels = more detailed shadowing but slower processing
+- **Scene complexity**: Dense vegetation creates more shadow interactions
+
+## Citation
+
+When using vostokR in your research, please cite both the R package and the original VOSTOK toolkit:
+
+```{r eval=FALSE}
+citation("vostokR")
+```
+
+## References
+
+- Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101.
+
+- Original VOSTOK implementation: Comprehensive solar potential analysis toolkit for 3D point clouds with octree-based shadow casting.
+
+## Session Information
+
+```{r}
+sessionInfo()
+```
