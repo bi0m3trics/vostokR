@@ -1,7 +1,9 @@
-|     |     |
-|-----|-----|
-
-vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
+<p style="display: flex; align-items: center; gap: 20px;">
+  <img src="images/vostokR.png" style="height: 150px; float: left; margin-right: 15px;">
+  <span style="font-size: 1.5em; font-weight: bold;">
+    <h1 style="margin: 0;">vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK</h1>
+  </span>
+</p>
 
 ## Overview
 
