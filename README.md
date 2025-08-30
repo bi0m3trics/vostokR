@@ -50,7 +50,7 @@ The Linke atmospheric turbidity coefficient, which models the atmospheric absorp
 install.packages(c("Rcpp", "lidR", "data.table", "terra", "sf"))
 
 # Install vostokR from GitHub
-# devtools::install_github("username/vostokR")
+# devtools::install_github("bi0m3trics/vostokR")
 ```
 
 ## Usage
