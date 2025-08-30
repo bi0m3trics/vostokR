@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 ![](images/header.png)vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
-=======
-![](images/header.png)
->>>>>>> 06259b39922a1285701dd3d653e64f99694701de
 
 ## Overview
 
