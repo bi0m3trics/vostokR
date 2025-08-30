@@ -1,8 +1,8 @@
 ![](images/header.png)
 
-##vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
 
-## Overview
+
+## vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
 
 vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
 
