@@ -23,7 +23,7 @@ When using this package, please cite both the R package and the original VOSTOK 
   author = {Andrew {Sánchez Meador} and Sebastian Bechtold and Bernhard Höfle},
   year = {2025},
   note = {R package version 0.1.0},
-  url = {https://github.com/3dgeo-heidelberg/vostok}
+  url = {https://github.com/bi0m3trics/vostokR}
 }
 
 @data{bechtold2020vostok,
