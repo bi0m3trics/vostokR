@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ![](images/header.png)vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
+=======
+![](images/header.png)
+>>>>>>> 06259b39922a1285701dd3d653e64f99694701de
 
 ## Overview
 
@@ -18,12 +22,12 @@ This R package is based on the original VOSTOK toolkit developed by Bechtold and
 When using this package, please cite both the R package and the original VOSTOK toolkit:
 
 ``` bibtex
-@Manual{vostokR,
+@manual{vostokR,
   title = {vostokR: Solar Potential Calculation for Point Clouds using VOSTOK},
   author = {Andrew {Sánchez Meador} and Sebastian Bechtold and Bernhard Höfle},
   year = {2025},
   note = {R package version 0.1.0},
-  url = {https://github.com/3dgeo-heidelberg/vostok}
+  url = {https://github.com/bi0m3trics/vostokR}
 }
 
 @data{bechtold2020vostok,
@@ -50,7 +54,7 @@ The Linke atmospheric turbidity coefficient, which models the atmospheric absorp
 install.packages(c("Rcpp", "lidR", "data.table", "terra", "sf"))
 
 # Install vostokR from GitHub
-# devtools::install_github("username/vostokR")
+devtools::install_github("bi0m3trics/vostokR")
 ```
 
 ## Usage
