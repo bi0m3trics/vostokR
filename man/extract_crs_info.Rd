@@ -33,6 +33,10 @@ extract_crs_info(las)
 
 \item{timezone}{Numeric. Time zone offset from UTC (auto-detected from CRS if NULL)}
 
+\item{n_threads}{Numeric. Number of OpenMP threads to use (default: auto-detect)}
+
+\item{clear_cache}{Logical. Clear performance caches before calculation (default: FALSE)}
+
 \item{...}{Additional arguments passed to other methods}
 }
 \value{
@@ -65,14 +69,15 @@ las_solar <- calculate_solar_potential(las,
                                      start_date = "2025-06-01",
                                      end_date = "2025-08-31")
 
-# Example 2: Manual location specification  
+# Example 2: Manual location specification with threading control
 las_solar <- calculate_solar_potential(las, 
                                      year = 2025,
                                      day_start = 150,
                                      day_end = 250,
                                      lat = 33.4484,
                                      lon = -112.0740,
-                                     timezone = -7)
+                                     timezone = -7,
+                                     n_threads = 4)
 
 # Plot solar potential on point cloud
 plot(las_solar, color = "solar_potential", pal = heat.colors(100))

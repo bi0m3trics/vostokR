@@ -19,6 +19,10 @@ taking into account shadowing effects from surrounding points.
   \item \code{\link{add_normals}} - Add normal vectors to point cloud  
   \item \code{\link{solar_ground_raster}} - Convert ground points to raster
   \item \code{\link{plot_solar_potential}} - Visualize results on point cloud
+  \item \code{\link{set_vostokr_threads}} - Configure OpenMP thread count
+  \item \code{\link{get_vostokr_threads}} - Get current thread configuration
+  \item \code{\link{get_vostokr_performance_info}} - Check OpenMP capabilities
+  \item \code{\link{clear_vostokr_caches}} - Clear performance caches
 }
 }
 
@@ -26,8 +30,8 @@ taking into account shadowing effects from surrounding points.
 
 When using this package, please cite both the R package and the original VOSTOK toolkit:
 \itemize{
-  \item Sánchez Meador, A., Bechtold, S., and Höfle, B. (2025). vostokR: Solar 
-        Potential Calculation for Point Clouds using VOSTOK. R package version 0.1.0.
+  \item Sánchez Meador, A.J. (2025). vostokR: Solar 
+        Potential Calculation for Point Clouds using VOSTOK. R package version 0.1.1.
   \item Bechtold, S. and Höfle, B. (2020). VOSTOK - The Voxel Octree Solar Toolkit. 
         heiDATA, V1. https://doi.org/10.11588/data/QNA02B
 }
@@ -40,13 +44,13 @@ heiDATA. \doi{10.11588/data/QNA02B}
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/3dgeo-heidelberg/vostok}
-  \item Report bugs at \url{https://github.com/3dgeo-heidelberg/vostok/issues}
+  \item \url{https://github.com/bi0m3trics/vostokR}
+  \item Report bugs at \url{https://github.com/bi0m3trics/vostokR/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Andrew Sanchez Meador \email{andrew.sanchezmeador@nau.edu}
+\strong{Maintainer}: Andrew J. Sanchez Meador \email{andrew.sanchezmeador@nau.edu}
 
 Authors:
 \itemize{

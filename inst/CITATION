@@ -3,16 +3,14 @@ citHeader("To cite vostokR in publications use:")
 bibentry(
   bibtype    = "Manual",
   title    = "vostokR: Solar Potential Calculation for Point Clouds using VOSTOK",
-  author   = c(person("Andrew", "Sanchez Meador"),
-               person("Sebastian", "Bechtold"), 
-               person("Bernhard", "Hofle")),
+  author   = person("Andrew J.", "Sanchez Meador"),
   year     = "2025",
-  note     = "R package version 0.1.0",
-  url      = "https://github.com/3dgeo-heidelberg/vostok",
-  textVersion = paste("Sanchez Meador, A., Bechtold, S., and Hofle, B. (2025).",
+  note     = "R package version 0.1.1",
+  url      = "https://github.com/bi0m3trics/vostokR",
+  textVersion = paste("Sánchez Meador, A.J. (2025).",
                      "vostokR: Solar Potential Calculation for Point Clouds using VOSTOK.",
-                     "R package version 0.1.0.",
-                     "https://github.com/3dgeo-heidelberg/vostok")
+                     "R package version 0.1.1.",
+                     "https://github.com/bi0m3trics/vostokR")
 )
 
 bibentry(

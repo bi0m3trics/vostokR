@@ -127,7 +127,7 @@ vostokR provides R bindings for the VOSTOK (Viewshed Obstruction by Solar Tracki
 
 #### Package Infrastructure
 • **New:** **Test data included** - Package includes `test.laz` file in `inst/extdata/` for examples and testing
-• **New:** **Proper authorship attribution** - Andrew Sánchez Meador as primary author, with Sebastian Bechtold and Bernhard Höfle credited for original VOSTOK implementation  
+• **New:** **Proper authorship attribution** - Andrew J. Sánchez Meador as primary author, with Sebastian Bechtold and Bernhard Höfle credited for original VOSTOK implementation  
 • **New:** **Academic references** - Links to original VOSTOK research and implementation
 • **New:** **GPL v3 licensing** - Open source license ensuring broad accessibility
 
@@ -227,14 +227,14 @@ citation("vostokR")
 ```
 
 **R Package Citation:**
-Sánchez Meador, A. (2025). vostokR: Solar Potential Calculation for Point Clouds using VOSTOK. R package version 0.1.0.
+Sánchez Meador, A.J. (2025). vostokR: Solar Potential Calculation for Point Clouds using VOSTOK. R package version 0.1.1.
 
 **Original VOSTOK Citation:**  
 Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101.
 
 ### Development and Contributions
 
-**Primary Author:** Andrew Sánchez Meador (Northern Arizona University)  
+**Primary Author:** Andrew J. Sánchez Meador (Northern Arizona University)  
 **Original VOSTOK Implementation:** Sebastian Bechtold and Bernhard Höfle  
 **License:** GPL (>= 3)  
 **Development Repository:** Integration with R ecosystem for VOSTOK solar potential toolkit

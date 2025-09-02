@@ -1,6 +1,6 @@
 ---
 title: "Solar Potential Analysis with vostokR"
-author: "Andrew Sánchez Meador"
+author: "Andrew J. Sánchez Meador"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -230,6 +230,55 @@ sd_solar <- sd(solar_values, na.rm = TRUE)
 # Identify high-potential areas
 threshold <- mean_solar + sd_solar
 high_potential_points <- filter_poi(las_solar, solar_potential > threshold)
+```
+
+## Performance Optimization
+
+vostokR v0.1.1 includes significant performance improvements with OpenMP parallelization and smart caching:
+
+### Thread Control
+
+```{r eval=FALSE}
+library(parallel)
+
+# Check system capabilities
+available_cores <- detectCores(logical = FALSE)
+cat("Available CPU cores:", available_cores, "\n")
+
+# Configure optimal threading (leave 1 core free)
+optimal_threads <- max(1, available_cores - 1)
+set_vostokr_threads(optimal_threads)
+
+# Verify configuration
+actual_threads <- get_vostokr_threads()
+cat("VostokR threads set to:", actual_threads, "\n")
+
+# Check OpenMP capabilities
+get_vostokr_performance_info()
+```
+
+### Performance Best Practices
+
+For optimal performance:
+
+- Use `set_vostokr_threads()` to configure threading before calculations
+- For large datasets, use larger `voxel_size` values to reduce computation time
+- Consider `day_step` and `minute_step` values to balance accuracy vs. speed
+- Clear caches with `clear_vostokr_caches()` between different analyses
+
+```{r eval=FALSE}
+# Example optimized configuration for large datasets
+set_vostokr_threads(6)  # Use most but not all cores
+
+las_solar_fast <- calculate_solar_potential(
+  las,
+  year = 2025,
+  start_date = '2025-06-15',
+  end_date = '2025-06-17', 
+  day_step = 1,           # Daily sampling
+  minute_step = 120,      # Every 2 hours
+  voxel_size = 2.0       # Larger voxels for speed
+)
 ```
 
 ## Technical Details

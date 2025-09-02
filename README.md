@@ -1,7 +1,5 @@
 ![](images/header.png)
 
-
-
 ## vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
 
 vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
@@ -22,9 +20,9 @@ When using this package, please cite both the R package and the original VOSTOK 
 ``` bibtex
 @manual{vostokR,
   title = {vostokR: Solar Potential Calculation for Point Clouds using VOSTOK},
-  author = {Andrew {Sánchez Meador} and Sebastian Bechtold and Bernhard Höfle},
+  author = {Andrew J. {Sánchez Meador}},
   year = {2025},
-  note = {R package version 0.1.0},
+  note = {R package version 0.1.1},
   url = {https://github.com/bi0m3trics/vostokR}
 }
 
@@ -57,7 +55,7 @@ devtools::install_github("bi0m3trics/vostokR")
 
 ## Usage
 
-Here's a basic example:
+Here's a simple introductory example:
 
 ``` r
 library(lidR)
@@ -68,40 +66,23 @@ library(terra)
 LASfile <- system.file("extdata", "test.laz", package="vostokR") 
 las <- readLAS(LASfile)
 
-# Add normal vectors if not present
+# Add normal vectors (required for solar calculations)
 las <- add_normals(las, k = 10)
 
-# Method 1: Auto-detect location from CRS with date range
+# Calculate solar potential for summer period
 las_solar <- calculate_solar_potential(las,
                                      year = 2025,
-                                     start_date = "2025-06-01",  # Summer period
+                                     start_date = "2025-06-01",
                                      end_date = "2025-08-31",
                                      day_step = 30,
-                                     minute_step = 60,
-                                     min_sun_angle = 5,
-                                     voxel_size = 1)
+                                     minute_step = 60)
 
-# Method 2: Manual coordinates with day numbers  
-las_solar <- calculate_solar_potential(las,
-                                     year = 2025, 
-                                     day_start = 150,   # Day of year
-                                     day_end = 250,
-                                     day_step = 30,
-                                     minute_step = 60,
-                                     min_sun_angle = 5,
-                                     voxel_size = 1,
-                                     lat = 35.27,      # Manual coordinates
-                                     lon = -111.69,
-                                     timezone = -7)
+# View results
+plot(las_solar, color = "solar_potential")
 
-# Visualization options:
-
-# 1. Plot solar potential on point cloud (lidR style)
-plot(las_solar, color = "solar_potential", pal = heat.colors(100))
-
-# 2. Create and plot ground raster using terra
+# Create ground raster
 ground_raster <- solar_ground_raster(las_solar, res = 1.0)
-plot(ground_raster, main = "Ground Solar Potential")
+plot(ground_raster)
 ```
 
 ## Key Features
@@ -113,6 +94,19 @@ plot(ground_raster, main = "Ground Solar Potential")
 -   **Multiple visualization options**: Point cloud plots and ground raster maps
 -   **Efficient C++ core**: Uses original VOSTOK C++ implementation for fast shadow calculations
 -   **OpenMP parallelization**: Multi-threaded processing for better performance
+
+## Performance Features
+
+vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3x faster processing**:
+
+-   **OpenMP parallelization**: Multi-threaded solar calculations with thread control functions
+-   **Spatial optimization**: Morton code Z-order sorting for improved cache performance
+-   **Intelligent caching**: SOLPOS result caching and thread-safe shadow caching
+-   **Batch processing**: Optimized memory access patterns with spatial batching
+-   **Thread control**: `set_vostokr_threads()`, `get_vostokr_threads()`, and performance monitoring
+-   **Production ready**: Tested up to 740,240 points with excellent scaling
+
+**Benchmarked performance**: 114,269 points/second with 7 threads on large datasets.
 
 ## Parameters
 
@@ -138,6 +132,10 @@ plot(ground_raster, main = "Ground Solar Potential")
 -   `add_normals()`: Calculate surface normal vectors using k-nearest neighbors
 -   `solar_ground_raster()`: Extract ground points and convert to terra SpatRaster\
 -   `plot_solar_potential()`: Visualize solar potential directly on point cloud
+-   `set_vostokr_threads()`: Configure OpenMP thread count for optimal performance
+-   `get_vostokr_threads()`: Get current thread configuration
+-   `get_vostokr_performance_info()`: Check OpenMP capabilities and status
+-   `clear_vostokr_caches()`: Clear performance caches
 
 ## Example Output
 
@@ -156,18 +154,6 @@ The solar potential calculation uses the original VOSTOK algorithm:
 
 The minimum sun angle parameter can be useful for forest plots or other cases where the shadow point cloud extent is limited. It prevents unrealistic illumination from very low sun angles that would normally be blocked by surrounding terrain not included in the point cloud.
 
-The tool will first provide some vostokmeta information and then run the solar potential calculation. On your screen, something like the following messages should appear:
-
-```         
-Auto-detected from CRS: lat=35.2704, lon=-111.6905, timezone=-7
-Date range 2025-06-01 to 2025-08-31 converted to days 152-243
-Point cloud size:            159.824 x 218.803 x 39.338
-Required octree volume size: 256
-Required octree depth:       8
-
-Building octree... finished.
-```
-
 ## Acknowledgments
 
 This package is based on VOSTOK (Voxel Octree Solar Toolkit) developed by:
@@ -179,7 +165,7 @@ Heidelberg University\
 
 When using this package, please cite the original VOSTOK work:
 
-Sánchez Meador, A., Bechtold, S. & Höfle, B. (2025): vostokR – Solar Potential Calculation for Point Clouds in R using VOSTOK. R package version 0.1.0. URL: <https://github.com/bi0m3trics/vostokR>
+Sánchez Meador, A.J. (2025): vostokR – Solar Potential Calculation for Point Clouds in R using VOSTOK. R package version 0.1.1. URL: <https://github.com/bi0m3trics/vostokR>
 
 Bechtold, S. & Höfle, B. (2020): VOSTOK - The Voxel Octree Solar Toolkit. heiDATA, V1. DOI: [10.11588/data/QNA02B](https://doi.org/10.11588/data/QNA02B).
 
