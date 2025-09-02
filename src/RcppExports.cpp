@@ -11,6 +11,65 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// set_vostokr_threads
+void set_vostokr_threads(int n_threads);
+RcppExport SEXP _vostokR_set_vostokr_threads(SEXP n_threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n_threads(n_threadsSEXP);
+    set_vostokr_threads(n_threads);
+    return R_NilValue;
+END_RCPP
+}
+// get_vostokr_threads
+int get_vostokr_threads();
+RcppExport SEXP _vostokR_get_vostokr_threads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_vostokr_threads());
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_actual_vostokr_threads
+int get_actual_vostokr_threads();
+RcppExport SEXP _vostokR_get_actual_vostokr_threads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_actual_vostokr_threads());
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_vostokr_max_threads
+int get_vostokr_max_threads();
+RcppExport SEXP _vostokR_get_vostokr_max_threads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_vostokr_max_threads());
+    return rcpp_result_gen;
+END_RCPP
+}
+// clear_vostokr_caches
+void clear_vostokr_caches();
+RcppExport SEXP _vostokR_clear_vostokr_caches() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    clear_vostokr_caches();
+    return R_NilValue;
+END_RCPP
+}
+// get_vostokr_performance_info
+List get_vostokr_performance_info();
+RcppExport SEXP _vostokR_get_vostokr_performance_info() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_vostokr_performance_info());
+    return rcpp_result_gen;
+END_RCPP
+}
 // calculate_solar_potential_cpp
 NumericVector calculate_solar_potential_cpp(NumericMatrix coords, NumericMatrix normals, int year, int day_start, int day_end, int day_step, int minute_step, double min_sun_angle, double voxel_size, double lat, double lon, double timezone);
 RcppExport SEXP _vostokR_calculate_solar_potential_cpp(SEXP coordsSEXP, SEXP normalsSEXP, SEXP yearSEXP, SEXP day_startSEXP, SEXP day_endSEXP, SEXP day_stepSEXP, SEXP minute_stepSEXP, SEXP min_sun_angleSEXP, SEXP voxel_sizeSEXP, SEXP latSEXP, SEXP lonSEXP, SEXP timezoneSEXP) {
@@ -35,6 +94,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_vostokR_set_vostokr_threads", (DL_FUNC) &_vostokR_set_vostokr_threads, 1},
+    {"_vostokR_get_vostokr_threads", (DL_FUNC) &_vostokR_get_vostokr_threads, 0},
+    {"_vostokR_get_actual_vostokr_threads", (DL_FUNC) &_vostokR_get_actual_vostokr_threads, 0},
+    {"_vostokR_get_vostokr_max_threads", (DL_FUNC) &_vostokR_get_vostokr_max_threads, 0},
+    {"_vostokR_clear_vostokr_caches", (DL_FUNC) &_vostokR_clear_vostokr_caches, 0},
+    {"_vostokR_get_vostokr_performance_info", (DL_FUNC) &_vostokR_get_vostokr_performance_info, 0},
     {"_vostokR_calculate_solar_potential_cpp", (DL_FUNC) &_vostokR_calculate_solar_potential_cpp, 12},
     {NULL, NULL, 0}
 };

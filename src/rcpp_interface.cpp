@@ -1,15 +1,86 @@
-#define ARMA_DONT_USE_OPENMP
 #include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include "IrradianceCalc.h"
 #include "ShadowCalc.h"
+#include "ShadowCalcOptimized.h"
+#include "SpatialOptimizer.h"
 #include "solpos/solpos00.h"
 #include "Vec3d.h"
 #include "pointCloud/LidrPointCloud.h"
 #include <vector>
+#include <algorithm>
+#include <chrono>
 
 using namespace Rcpp;
+
+// OpenMP thread control functions
+// [[Rcpp::export]]
+void set_vostokr_threads(int n_threads) {
+#ifdef _OPENMP
+    if (n_threads > 0) {
+        omp_set_num_threads(n_threads);
+    }
+#endif
+}
+
+// [[Rcpp::export]]
+int get_vostokr_threads() {
+#ifdef _OPENMP
+    return omp_get_max_threads();
+#else
+    return 1;
+#endif
+}
+
+// [[Rcpp::export]]
+int get_actual_vostokr_threads() {
+#ifdef _OPENMP
+    int actual_threads = 1;
+    #pragma omp parallel
+    {
+        #pragma omp single
+        actual_threads = omp_get_num_threads();
+    }
+    return actual_threads;
+#else
+    return 1;
+#endif
+}
+
+// [[Rcpp::export]]
+int get_vostokr_max_threads() {
+#ifdef _OPENMP
+    return omp_get_num_procs();
+#else
+    return 1;
+#endif
+}
+
+// Performance monitoring and cache control
+// [[Rcpp::export]]
+void clear_vostokr_caches() {
+    SolposCache::getInstance().clear();
+    // Note: Thread-local caches are cleared automatically
+}
+
+// [[Rcpp::export]]
+List get_vostokr_performance_info() {
+    List info;
+    info["openmp_enabled"] = 
+#ifdef _OPENMP
+        true;
+#else
+        false;
+#endif
+    info["max_threads"] = get_vostokr_max_threads();
+    info["current_threads"] = get_vostokr_threads();
+    return info;
+}
 
 // [[Rcpp::export]]
 NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
@@ -24,78 +95,118 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
                                          double lat,
                                          double lon,
                                          double timezone) {
+    
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
     int n_points = coords.nrow();
-    NumericVector solar_potential(n_points);
-    
-    // Initialize SOLPOS
-    posdata solpos;
-    S_init(&solpos);
-    
-    solpos.year = year;
-    solpos.latitude = lat;
-    solpos.longitude = lon;
-    solpos.timezone = timezone;
+    NumericVector solar_potential(n_points, 0.0);
     
     // Create point cloud wrapper around the input data
     LidrPointCloud pointCloud(coords, normals);
     
-    // Initialize shadow calculator with octree
-    ShadowCalc shadow_calc(pointCloud, voxel_size);
+    // Initialize optimized shadow calculator with caching
+    ShadowCalcOptimized shadow_calc(pointCloud, voxel_size);
     
-    // Loop through days
-    for(int day = day_start; day <= day_end; day += day_step) {
-        solpos.daynum = day;
+    // Compute spatial ordering for cache coherence
+    std::vector<size_t> spatial_order = SpatialOptimizer::computeSpatialOrder(coords);
+    
+    // Create spatial batches for processing
+    const size_t BATCH_SIZE = 64; // Optimized batch size
+    std::vector<std::vector<size_t>> spatial_batches = 
+        SpatialOptimizer::createSpatialBatches(spatial_order, BATCH_SIZE);
+    
+    // SOLPOS cache for temporal coherence
+    SolposCache& solpos_cache = SolposCache::getInstance();
+    
+    // Get current thread setting
+    int num_threads = omp_get_max_threads();
+    
+    // Hierarchical parallelization: parallel over time, then space
+    #pragma omp parallel num_threads(num_threads)
+    {
+        // Each thread gets its own SOLPOS struct
+        posdata thread_solpos;
+        S_init(&thread_solpos);
+        thread_solpos.year = year;
+        thread_solpos.latitude = lat;
+        thread_solpos.longitude = lon;
+        thread_solpos.timezone = timezone;
         
-        // Get sunrise and sunset times
-        solpos.hour = 12;
-        solpos.minute = 0;
-        solpos.second = 0;
-        S_decode(S_solpos(&solpos), &solpos);
-        
-        int sunrise_minute = solpos.sretr;
-        int sunset_minute = solpos.ssetr;
-        
-        // Loop through minutes between sunrise and sunset
-        for(int current_minute = sunrise_minute; 
-            current_minute < sunset_minute; 
-            current_minute += minute_step) {
+        // Parallel over days
+        #pragma omp for schedule(dynamic)
+        for(int day = day_start; day <= day_end; day += day_step) {
+            thread_solpos.daynum = day;
             
-            solpos.hour = current_minute / 60;
-            solpos.minute = current_minute - solpos.hour * 60;
-            solpos.second = 0;
+            // Get sunrise and sunset times
+            thread_solpos.hour = 12;
+            thread_solpos.minute = 0;
+            thread_solpos.second = 0;
+            S_decode(S_solpos(&thread_solpos), &thread_solpos);
             
-            // Calculate sun position
-            S_decode(S_solpos(&solpos), &solpos);
+            int sunrise_minute = thread_solpos.sretr;
+            int sunset_minute = thread_solpos.ssetr;
             
-            if(solpos.elevref >= min_sun_angle) {
-                // Create irradiance calculator for current time
-                IrradianceCalc irr_calc(solpos);
+            // Loop through minutes between sunrise and sunset
+            for(int current_minute = sunrise_minute; 
+                current_minute < sunset_minute; 
+                current_minute += minute_step) {
                 
-                // Process each point
-                #pragma omp parallel for
-                for(int i = 0; i < n_points; i++) {
-                    std::vector<double> point(6);
-                    for (int j = 0; j < 3; j++) {
-                        point[j] = coords(i,j);
-                        point[j+3] = normals(i,j);
+                thread_solpos.hour = current_minute / 60;
+                thread_solpos.minute = current_minute - thread_solpos.hour * 60;
+                thread_solpos.second = 0;
+                
+                // Check SOLPOS cache first
+                SolposKey solpos_key = {day, thread_solpos.hour, thread_solpos.minute, lat, lon};
+                if (!solpos_cache.getCachedSolpos(solpos_key, thread_solpos)) {
+                    // Calculate sun position if not cached
+                    S_decode(S_solpos(&thread_solpos), &thread_solpos);
+                    solpos_cache.setCachedSolpos(solpos_key, thread_solpos);
+                }
+                
+                if(thread_solpos.elevref >= min_sun_angle) {
+                    // Create irradiance calculator for current time
+                    IrradianceCalc irr_calc(thread_solpos);
+                    
+                    // Process spatial batches for better cache locality
+                    for (const auto& batch : spatial_batches) {
+                        // Prepare batch data
+                        std::vector<std::vector<double>> batch_points;
+                        batch_points.reserve(batch.size());
+                        
+                        for (size_t idx : batch) {
+                            std::vector<double> point(6);
+                            for (int j = 0; j < 3; j++) {
+                                point[j] = coords(idx, j);
+                                point[j+3] = normals(idx, j);
+                            }
+                            batch_points.push_back(point);
+                        }
+                        
+                        // Compute shadows for entire batch
+                        std::vector<bool> illuminated_batch = 
+                            shadow_calc.computeShadowBatch(thread_solpos, batch_points);
+                        
+                        // Calculate irradiance and accumulate results
+                        for (size_t b = 0; b < batch.size(); ++b) {
+                            size_t point_idx = batch[b];
+                            
+                            double irr = irr_calc.getIrradiance(batch_points[b], illuminated_batch[b]);
+                            float sunny_hours = (float)(minute_step) / 60.0;
+                            
+                            // Thread-safe accumulation
+                            #pragma omp atomic
+                            solar_potential[point_idx] += irr * sunny_hours * day_step;
+                        }
                     }
-                    
-                    // Check if point is illuminated
-                    bool illuminated = shadow_calc.computeShadow(solpos, point);
-                    
-                    // Calculate irradiance for current timestep
-                    double irr = irr_calc.getIrradiance(point, illuminated);
-                    
-                    // Calculate sunny hours in current timestep
-                    float sunny_hours = (float)(minute_step) / 60.0;
-                    
-                    // Add to total
-                    #pragma omp atomic
-                    solar_potential[i] += irr * sunny_hours * day_step;
                 }
             }
         }
-    }
+    } // End parallel region
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    
+    Rcpp::Rcout << "Solar potential calculation completed in " << duration.count() << " ms" << std::endl;
     
     return solar_potential;
 }

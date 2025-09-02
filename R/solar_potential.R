@@ -18,6 +18,8 @@
 #' @param lat Numeric. Latitude of the study area (auto-detected from CRS if NULL)
 #' @param lon Numeric. Longitude of the study area (auto-detected from CRS if NULL)
 #' @param timezone Numeric. Time zone offset from UTC (auto-detected from CRS if NULL)
+#' @param n_threads Numeric. Number of OpenMP threads to use (default: auto-detect)
+#' @param clear_cache Logical. Clear performance caches before calculation (default: FALSE)
 #' @param ... Additional arguments passed to other methods
 #' @return LAS object with added column for solar potential in Wh/m²/day
 #' @export
@@ -40,14 +42,15 @@
 #'                                      start_date = "2025-06-01",
 #'                                      end_date = "2025-08-31")
 #' 
-#' # Example 2: Manual location specification  
+#' # Example 2: Manual location specification with threading control
 #' las_solar <- calculate_solar_potential(las, 
 #'                                      year = 2025,
 #'                                      day_start = 150,
 #'                                      day_end = 250,
 #'                                      lat = 33.4484,
 #'                                      lon = -112.0740,
-#'                                      timezone = -7)
+#'                                      timezone = -7,
+#'                                      n_threads = 4)
 #' 
 #' # Plot solar potential on point cloud
 #' plot(las_solar, color = "solar_potential", pal = heat.colors(100))
@@ -125,6 +128,50 @@ date_to_day_numbers <- function(start_date, end_date, year) {
     return(list(day_start = day_start, day_end = day_end))
 }
 
+#' Set VostokR OpenMP Thread Count
+#'
+#' Control the number of OpenMP threads used by VostokR calculations
+#'
+#' @param n_threads Integer. Number of threads to use. If NULL, auto-detect based on available cores and lidR settings.
+#' @export
+set_vostokr_threads <- function(n_threads = NULL) {
+    if (is.null(n_threads)) {
+        # Auto-coordinate with lidR
+        lidr_threads <- get_lidr_threads()
+        available_cores <- parallel::detectCores(logical = FALSE)
+        n_threads <- max(1, (available_cores - 1) %/% max(1, lidr_threads))
+    }
+    
+    .Call("_vostokR_set_vostokr_threads", as.integer(n_threads))
+    message("VostokR threads set to: ", n_threads)
+}
+
+#' Get Current VostokR Thread Count
+#'
+#' @return Integer. Current number of OpenMP threads
+#' @export
+get_vostokr_threads <- function() {
+    .Call("_vostokR_get_vostokr_threads")
+}
+
+#' Get VostokR Performance Information
+#'
+#' @return List with OpenMP status and thread information
+#' @export
+get_vostokr_performance_info <- function() {
+    .Call("_vostokR_get_vostokr_performance_info")
+}
+
+#' Clear VostokR Performance Caches
+#'
+#' Clears internal SOLPOS and shadow caches to free memory
+#'
+#' @export
+clear_vostokr_caches <- function() {
+    .Call("_vostokR_clear_vostokr_caches")
+    message("VostokR caches cleared")
+}
+
 #' @export
 calculate_solar_potential <- function(las, ...) {
   UseMethod("calculate_solar_potential", las)
@@ -144,7 +191,32 @@ calculate_solar_potential.LAS <- function(las,
                                        lat = NULL,
                                        lon = NULL,
                                        timezone = NULL,
+                                       n_threads = NULL,
+                                       clear_cache = FALSE,
                                        ...) {
+    
+    # Auto-coordinate threading with lidR
+    if (is.null(n_threads)) {
+        lidr_threads <- get_lidr_threads()
+        available_cores <- parallel::detectCores(logical = FALSE)
+        # Use remaining cores, but leave at least 1 for system
+        n_threads <- max(1, (available_cores - 1) %/% max(1, lidr_threads))
+    }
+    
+    # Set VostokR threads
+    set_vostokr_threads(n_threads)
+    
+    # Clear caches if requested
+    if (clear_cache) {
+        clear_vostokr_caches()
+    }
+    
+    # Print performance info
+    perf_info <- get_vostokr_performance_info()
+    message("VostokR Performance Info:")
+    message("  OpenMP enabled: ", perf_info$openmp_enabled)
+    message("  Using threads: ", perf_info$current_threads, "/", perf_info$max_threads)
+    message("  lidR threads: ", get_lidr_threads())
     
     # Auto-detect CRS information if not provided
     if (is.null(lat) || is.null(lon) || is.null(timezone)) {

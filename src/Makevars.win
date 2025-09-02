@@ -1,10 +1,12 @@
 CXX_STD = CXX17
 
-PKG_CPPFLAGS = -I. -Ioctree -Isolpos -fopenmp
+PKG_CPPFLAGS = -I. -Ioctree -Isolpos -fopenmp -O3 -march=native -DARMA_USE_OPENMP
 PKG_LIBS = -fopenmp -lgomp
 
 OBJECTS = RcppExports.o \
           rcpp_interface.o \
+          ShadowCalcOptimized.o \
+          SpatialOptimizer.o \
           IrradianceCalc.o \
           ShadowCalc.o \
           Vec3d.o \
