@@ -4,7 +4,7 @@ library(lidR)
 library(vostokR)
 
 # Read example LiDAR data
-LASfile <- system.file("extdata", "MixedConifer.laz", package="lidR")
+LASfile <- system.file("extdata", "test.laz", package="vostokR")
 las <- readLAS(LASfile)
 
 # Add normal vectors if not present
@@ -25,7 +25,27 @@ las_solar <- calculate_solar_potential(las,
                                     timezone = -8)  # Pacific Time
 
 # Plot the results as a raster
-solar_raster <- plot_solar_raster(las_solar)
+plot(las_solar, color = "solar_potential", pal = heat.colors(100))
 
 # Print summary statistics
 summary(las_solar$solar_potential)
+
+# After calculating solar potential
+solar_raster <- solar_ground_raster(las_solar, res = 1)# Get values
+vals <- terra::values(solar_raster, na.rm = TRUE)
+
+# Define your palette from full sun -> shadow
+sun_palette <- c(
+  "#FDB813",  # full sun
+  "#FFD966",  # moderate
+  "#A3C4BC",  # low
+  "#2E3440"   # no sun / shadow
+)
+
+# Make a numeric color palette
+pal <- colorNumeric(
+  palette = sun_palette,
+  domain = vals
+)
+
+plot(solar_raster, main = "Ground Solar Potential", col = pal)
