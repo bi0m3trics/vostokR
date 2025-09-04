@@ -123,7 +123,7 @@ vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3
 ### Location Parameters (auto-detected if not provided)
 
 -   `lat`: Latitude of study area (auto-detected from CRS)
--   `lon`: Longitude of study area (auto-detected from CRS)\
+-   `lon`: Longitude of study area (auto-detected from CRS)
 -   `timezone`: Time zone offset from UTC (auto-detected from CRS)
 
 ## Functions
