@@ -104,9 +104,6 @@ vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3
 -   **Intelligent caching**: SOLPOS result caching and thread-safe shadow caching
 -   **Batch processing**: Optimized memory access patterns with spatial batching
 -   **Thread control**: `set_vostokr_threads()`, `get_vostokr_threads()`, and performance monitoring
--   **Production ready**: Tested up to 740,240 points with excellent scaling
-
-**Benchmarked performance**: 114,269 points/second with 7 threads on large datasets.
 
 ## Parameters
 
@@ -123,7 +120,7 @@ vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3
 ### Location Parameters (auto-detected if not provided)
 
 -   `lat`: Latitude of study area (auto-detected from CRS)
--   `lon`: Longitude of study area (auto-detected from CRS)\
+-   `lon`: Longitude of study area (auto-detected from CRS)
 -   `timezone`: Time zone offset from UTC (auto-detected from CRS)
 
 ## Functions
