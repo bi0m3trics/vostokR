@@ -1,7 +1,7 @@
-<img width="2000" height="512" alt="header" src="https://github.com/user-attachments/assets/6cfd7abe-a918-442d-bb24-be67e88d17e6" />
+<img width="2000" height="512" alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/header.png" />
 
 ## vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
-<img width="2000" alt="vostokR_SummaryOverview" src="https://github.com/user-attachments/assets/c17c374a-4a93-4279-a9f4-5fb2bd3e775a" />
+<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/vostokR_SummaryOverview.png" align="right" width="100%" />
 vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
 
 The package integrates seamlessly with the lidR ecosystem for LiDAR data processing and uses the SOLPOS library from the U.S. Department of Energy National Renewable Energy Laboratory for accurate solar position calculations.
@@ -138,7 +138,8 @@ vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3
 
 The output point cloud contains the original coordinates, normal vectors (nx, ny, nz), and a new `solar_potential` column with values in kWh/m²/year. Ground rasters show spatial patterns of solar potential across the landscape.
 
-<img src="images/Example_Large.gif" align="right" width="100%"/> ![](images/clipboard-2051438653.png)
+<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/Example_Large.gif" align="right" width="100%" />
+<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/clipboard-2051438653.png" align="right" width="100%" />
 
 ## Implementation Details
 
