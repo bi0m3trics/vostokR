@@ -1,6 +1,7 @@
 CXX_STD = CXX17
 
-PKG_CPPFLAGS = -I. -Ioctree -Isolpos -fopenmp -O3 -march=native -DARMA_USE_OPENMP
+PKG_CPPFLAGS = -I. -Ioctree -Isolpos -DARMA_USE_OPENMP
+PKG_CXXFLAGS = -fopenmp
 PKG_LIBS = -fopenmp -lgomp
 
 OBJECTS = RcppExports.o \

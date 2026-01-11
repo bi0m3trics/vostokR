@@ -21,7 +21,7 @@
 #' @param n_threads Numeric. Number of OpenMP threads to use (default: auto-detect)
 #' @param clear_cache Logical. Clear performance caches before calculation (default: FALSE)
 #' @param ... Additional arguments passed to other methods
-#' @return LAS object with added column for solar potential in Wh/m²/day
+#' @return LAS object with added column for solar potential in Wh/m^2/day
 #' @export
 #' @examples
 #' \dontrun{
@@ -59,6 +59,9 @@
 #' ground_raster <- solar_ground_raster(las_solar, res = 1)
 #' plot(ground_raster, main = "Ground Solar Potential")
 #' }
+#' @name calculate_solar_potential
+NULL
+
 #' Extract Geographic Information from LAS CRS
 #'
 #' Attempts to extract latitude, longitude, and timezone from LAS coordinate reference system
@@ -172,11 +175,13 @@ clear_vostokr_caches <- function() {
     message("VostokR caches cleared")
 }
 
+#' @rdname calculate_solar_potential
 #' @export
 calculate_solar_potential <- function(las, ...) {
   UseMethod("calculate_solar_potential", las)
 }
 
+#' @rdname calculate_solar_potential
 #' @export
 calculate_solar_potential.LAS <- function(las,
                                        year = 2025,
@@ -297,6 +302,7 @@ calculate_solar_potential.LAS <- function(las,
     return(las)
 }
 
+#' @rdname calculate_solar_potential
 #' @export
 calculate_solar_potential.LAScatalog <- function(las,
                                               year = 2025,
@@ -421,15 +427,25 @@ solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points =
     
     cat("Using", nrow(ground_points@data), "points for raster creation\n")
     cat("Solar potential range:", 
-        round(range(ground_points@data$solar_potential), 2), "kWh/m²/year\n")
+        round(range(ground_points@data$solar_potential), 2), "kWh/m^2/year\n")
     
-    # Create raster using grid_metrics which is better for point attributes
-    solar_raster <- lidR::grid_metrics(ground_points, 
-                                      ~mean(solar_potential, na.rm = TRUE), 
-                                      res = res)
+    # Create terra raster directly from point data
+    # Convert LAS to sf points
+    coords <- data.frame(
+        x = ground_points@data$X,
+        y = ground_points@data$Y,
+        solar_potential = ground_points@data$solar_potential
+    )
     
-    # Convert to terra SpatRaster
-    solar_raster <- terra::rast(solar_raster)
+    # Create SpatVector from points
+    pts <- terra::vect(coords, geom = c("x", "y"), crs = sf::st_crs(ground_points)$wkt)
+    
+    # Create raster template
+    bbox <- terra::ext(pts)
+    template <- terra::rast(bbox, resolution = res, crs = terra::crs(pts))
+    
+    # Rasterize using mean aggregation
+    solar_raster <- terra::rasterize(pts, template, field = "solar_potential", fun = mean)
     
     # Check if raster has values
     if (all(is.na(terra::values(solar_raster)))) {

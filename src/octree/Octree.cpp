@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <cfloat>
 #include <cmath>
-#include <iostream>
 #include <stack>
+#include <Rcpp.h>
 #include "Octree.h"
 
 Octree::Octree(std::vector<double> min, std::vector<double> max, double voxelSize) {
@@ -21,8 +21,8 @@ Octree::Octree(std::vector<double> min, std::vector<double> max, double voxelSiz
 
 	Vec3d diff = Vec3d(max[0], max[1], max[2]) - mMin;
 
-	std::cout << "Point cloud size:            ";
-	std::cout << diff.mCoords[0] << " x " << diff.mCoords[1] << " x " << diff.mCoords[2] << std::endl;
+	Rcpp::Rcout << "Point cloud size:            ";
+	Rcpp::Rcout << diff.mCoords[0] << " x " << diff.mCoords[1] << " x " << diff.mCoords[2] << std::endl;
 
 	double requiredMinSize = std::max(std::max(diff.mCoords[0], diff.mCoords[1]), diff.mCoords[2]);
 	//################## END Determine required minimum size ####################
@@ -40,8 +40,8 @@ Octree::Octree(std::vector<double> min, std::vector<double> max, double voxelSiz
 
 	//################## END Determine actual size ####################
 
-	std::cout << "Required octree volume size: " << mSize << std::endl;
-	std::cout << "Required octree depth:       " << mDepth << std::endl << std::endl;
+	Rcpp::Rcout << "Required octree volume size: " << mSize << std::endl;
+	Rcpp::Rcout << "Required octree depth:       " << mDepth << std::endl << std::endl;
 }
 
 Octree::~Octree() {

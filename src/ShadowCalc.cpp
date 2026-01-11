@@ -9,17 +9,17 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include <omp.h>
 #include <stack>
 #include <vector>
+#include <Rcpp.h>
 #include "OctreeRaycaster.h"
 
 
 ShadowCalc::ShadowCalc(AbstractPointCloud& shadowCloud, double voxelSize) : m_octree(shadowCloud.getMin(), shadowCloud.getMax(), voxelSize) {
 
 	//########## BEGIN Read input file for second time to build octree #################
-	std::cout << "Building octree... " << std::flush;
+	Rcpp::Rcout << "Building octree... " << std::flush;
 
 	shadowCloud.resetCursor();
 
@@ -47,7 +47,7 @@ ShadowCalc::ShadowCalc(AbstractPointCloud& shadowCloud, double voxelSize) : m_oc
 		//############### END Insert point into octree ###############
 	}
 
-	std::cout << "finished." << std::endl << std::endl << std::flush;
+	Rcpp::Rcout << "finished." << std::endl << std::endl << std::flush;
 
 }
 
@@ -109,7 +109,7 @@ bool ShadowCalc::computeShadow(const posdata& solposData, const std::vector<doub
 		rayDirX = 0;
 		rayDirY = 0;
 
-		std::cout << "Parallele Strahlen!" << std::endl;
+		// Rcpp::Rcout << "Parallel beams!" << std::endl;
 	}
 
 	// Create light direction vector and make it short:

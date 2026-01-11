@@ -20,7 +20,7 @@ Description: Calculate solar potential for LiDAR point clouds using the VOSTOK
     for each point while accounting for shadowing effects. Integrates seamlessly with 
     the lidR package for LiDAR data processing workflows. The original VOSTOK toolkit 
     is available at <doi:10.11588/data/QNA02B>.
-License: GPL (>= 3)
+License: GPL (>= 3) + file LICENSE
 URL: https://github.com/bi0m3trics/vostokR
 BugReports: https://github.com/bi0m3trics/vostokR/issues
 Encoding: UTF-8
