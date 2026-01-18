@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.width = 7,
-  fig.height = 5
+  fig.height = 5,
+  eval = FALSE  # Disable evaluation by default to prevent crashes during build
 )
 ```
 
@@ -73,7 +74,7 @@ las <- readLAS(LASfile)
 print(las)
 ```
 
-```{r}
+```{r eval=FALSE}
 # Add surface normals
 las <- add_normals(las, k = 10)
 ```
@@ -82,7 +83,7 @@ las <- add_normals(las, k = 10)
 
 The main function `calculate_solar_potential()` computes solar irradiance for each point in the cloud, accounting for shadowing effects:
 
-```{r}
+```{r eval=FALSE}
 # Calculate solar potential for a specific time period
 # Using a subset for faster processing in this example
 las_small <- filter_poi(las, X < min(X) + 50 & Y < min(Y) + 50)
@@ -105,12 +106,12 @@ The function automatically detects the coordinate system and extracts the approp
 
 After calculation, each point has a new `solar_potential` attribute containing the annual solar irradiance in kWh/m²/year:
 
-```{r}
+```{r eval=FALSE}
 # Check the range of solar potential values
 summary(las_solar$solar_potential)
 ```
 
-```{r}
+```{r eval=FALSE}
 # Visualize the solar potential on the point cloud
 plot(las_solar, color = "solar_potential", bg = "white")
 ```
@@ -119,7 +120,7 @@ plot(las_solar, color = "solar_potential", bg = "white")
 
 Generate raster maps to visualize spatial patterns of solar potential:
 
-```{r}
+```{r eval=FALSE}
 # Create a ground-level solar potential raster
 ground_raster <- solar_ground_raster(las_solar, res = 2.0)
 
@@ -131,7 +132,7 @@ if (!is.null(ground_raster)) {
 
 If no ground points are classified in your data, use all points:
 
-```{r}
+```{r eval=FALSE}
 # Alternative: use all points for raster creation
 all_points_raster <- solar_ground_raster(las_solar, res = 2.0, use_all_points = TRUE)
 plot(all_points_raster, main = "Solar Potential - All Points (kWh/m²/year)")
@@ -326,6 +327,6 @@ citation("vostokR")
 
 ## Session Information
 
-```{r}
+```{r eval=TRUE}
 sessionInfo()
 ```

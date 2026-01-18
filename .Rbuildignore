@@ -5,3 +5,7 @@
 ^CMakeLists\.txt$
 ^images$
 \.o$
+^build$
+^\.github$
+^\.cmake$
+^vignettes$

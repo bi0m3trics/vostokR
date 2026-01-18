@@ -8,7 +8,6 @@
 src/*.o
 src/*.so
 src/*.dll
-src/Makevars
 
 # Build directories
 inst/doc

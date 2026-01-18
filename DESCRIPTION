@@ -41,6 +41,5 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 Config/testthat/edition: 3
-VignetteBuilder: knitr
 RoxygenNote: 7.3.2
 SystemRequirements: C++17

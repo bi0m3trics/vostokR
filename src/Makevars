@@ -1,0 +1,21 @@
+CXX_STD = CXX17
+
+# Detect OpenMP support
+OPENMP_CXXFLAGS = $(shell ${R_HOME}/bin/R CMD config SHLIB_OPENMP_CXXFLAGS)
+
+PKG_CPPFLAGS = -I. -Ioctree -Isolpos -DARMA_USE_OPENMP
+PKG_CXXFLAGS = $(OPENMP_CXXFLAGS)
+PKG_LIBS = $(OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+
+OBJECTS = RcppExports.o \
+          rcpp_interface.o \
+          ShadowCalcOptimized.o \
+          SpatialOptimizer.o \
+          IrradianceCalc.o \
+          ShadowCalc.o \
+          Vec3d.o \
+          solpos/solpos.o \
+          octree/Octree.o \
+          octree/OctreeNode.o \
+          octree/OctreeNodeInfo.o \
+          pointCloud/AbstractPointCloud.o
