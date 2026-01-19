@@ -119,7 +119,11 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
     SolposCache& solpos_cache = SolposCache::getInstance();
     
     // Get current thread setting
+#ifdef _OPENMP
     int num_threads = omp_get_max_threads();
+#else
+    int num_threads = 1;
+#endif
     
     // Hierarchical parallelization: parallel over time, then space
     #pragma omp parallel num_threads(num_threads)
