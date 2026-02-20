@@ -25,18 +25,18 @@ The `vostokR` package provides R bindings for the VOSTOK (Viewshed Obstruction b
 
 This package enables researchers and practitioners to:
 
-- Calculate solar potential on LiDAR point clouds
-- Generate solar potential raster maps
-- Account for topographic and vegetation shadowing
-- Support flexible temporal analysis periods
-- Integrate seamlessly with the R spatial ecosystem
+-   Calculate solar potential on LiDAR point clouds
+-   Generate solar potential raster maps
+-   Account for topographic and vegetation shadowing
+-   Support flexible temporal analysis periods
+-   Integrate seamlessly with the R spatial ecosystem
 
 ## Installation
 
 ```{r eval=FALSE}
 # Install development version from source
 # (assuming package is already built and available)
-install.packages("path/to/vostokR", repos = NULL, type = "source")
+devtools::install_github("bi0m3trics/vostokR")
 ```
 
 ## Loading Required Packages
@@ -56,18 +56,7 @@ First, load your LiDAR data and add surface normals, which are required for the 
 
 ```{r eval=FALSE}
 # Load LiDAR data
-LASfile <- "path/to/your/lidar/data.laz"
-las <- readLAS(LASfile)
-
-# Add surface normals (required for solar calculations)
-las <- add_normals(las, k = 10)
-```
-
-For this demonstration, we'll use the included test data:
-
-```{r}
-# Load test data included with the package
-LASfile <- system.file('extdata', 'test.laz', package='vostokR')
+LASfile <- system.file("extdata", "test.laz", package="vostokR") 
 las <- readLAS(LASfile)
 
 # Display basic information about the point cloud
@@ -113,7 +102,7 @@ summary(las_solar$solar_potential)
 
 ```{r eval=FALSE}
 # Visualize the solar potential on the point cloud
-plot(las_solar, color = "solar_potential", bg = "white")
+plot(las_solar, color = "solar_potential", bg = "white", size=5)
 ```
 
 ### 4. Creating Solar Potential Rasters
@@ -172,10 +161,10 @@ winter_solar <- calculate_solar_potential(
 
 Key parameters that affect computation time and accuracy:
 
-- **`voxel_size`**: Smaller values = higher accuracy but longer computation time
-- **`minute_step`**: Smaller values = more temporal samples but longer computation time
-- **`min_sun_angle`**: Higher values = exclude low-angle sun positions
-- **`day_step`**: For long periods, use larger steps to reduce computation time
+-   **`voxel_size`**: Smaller values = higher accuracy but longer computation time
+-   **`minute_step`**: Smaller values = more temporal samples but longer computation time
+-   **`min_sun_angle`**: Higher values = exclude low-angle sun positions
+-   **`day_step`**: For long periods, use larger steps to reduce computation time
 
 ### Working with Large Datasets
 
@@ -183,23 +172,54 @@ For large point clouds, consider processing in chunks:
 
 ```{r eval=FALSE}
 # Process large datasets using lidR catalog
-ctg <- readLAScatalog("path/to/large/dataset/")
+ctg <- readLAScatalog(LASfile)
 
 # Set processing options
-opt_chunk_size(ctg) <- 200  # 200m chunks
+opt_chunk_size(ctg) <- 100  # 100m chunks
 opt_chunk_buffer(ctg) <- 50 # 50m buffer
 
 # Process with catalog
 solar_results <- catalog_apply(ctg, function(chunk) {
-  chunk <- add_normals(chunk, k = 10)
+  las <- readLAS(chunk)
+  
+  # Skip empty chunks
+  if (is.empty(las)) return(NULL)
+  
+  las <- add_normals(las, k = 10)
+  
+  # Extract geographic info from CRS (required for solar calculations)
+  crs_info <- vostokR:::extract_crs_info(las)
+  
+  # Convert date strings to day numbers
+  date_range <- vostokR:::date_to_day_numbers('2025-06-15', '2025-06-17', 2025)
+  
   calculate_solar_potential(
-    chunk,
+    las,
     year = 2025,
-    start_date = '2025-06-15',
-    end_date = '2025-06-17',
-    voxel_size = 2.0
+    day_start = date_range$day_start,
+    day_end = date_range$day_end,
+    day_step = 1,
+    minute_step = 60,
+    voxel_size = 2.0,
+    lat = crs_info$lat,           # Explicitly provide from CRS
+    lon = crs_info$lon,           # Explicitly provide from CRS
+    timezone = crs_info$timezone  # Explicitly provide from CRS
   )
 })
+```
+
+Visualize the catalog processing results:
+
+```{r eval=FALSE}
+# Merge the list of las into a single las
+# Remove NULL results from empty chunks
+valid_results <- solar_results[!sapply(solar_results, is.null)]
+
+# Mosaic all chunks into a single raster
+solar_mosaic <- do.call(rbind, valid_results)
+
+# Create a simple visualization to validate results
+plot(solar_mosaic, color = "solar_potential", bg = "white", size=2)
 ```
 
 ## Integration with Other Packages
@@ -214,8 +234,8 @@ raster_sf <- as.polygons(ground_raster, dissolve = FALSE) |> st_as_sf()
 high_potential <- raster_sf[raster_sf$V1 > 8000, ]  # Areas with >8000 kWh/m²/year
 
 # Export results
-writeVector(vect(high_potential), "high_solar_potential.shp")
-writeRaster(ground_raster, "solar_potential.tif")
+# writeVector(vect(high_potential), "high_solar_potential.shp")
+# writeRaster(ground_raster, "solar_potential.tif")
 ```
 
 ### Statistical Analysis
@@ -240,10 +260,10 @@ vostokR v0.1.1 includes significant performance improvements with OpenMP paralle
 ### Thread Control
 
 ```{r eval=FALSE}
-library(parallel)
+library(parallelly)
 
 # Check system capabilities
-available_cores <- detectCores(logical = FALSE)
+available_cores <- parallelly::availableCores(logical = FALSE)
 cat("Available CPU cores:", available_cores, "\n")
 
 # Configure optimal threading (leave 1 core free)
@@ -262,10 +282,10 @@ get_vostokr_performance_info()
 
 For optimal performance:
 
-- Use `set_vostokr_threads()` to configure threading before calculations
-- For large datasets, use larger `voxel_size` values to reduce computation time
-- Consider `day_step` and `minute_step` values to balance accuracy vs. speed
-- Clear caches with `clear_vostokr_caches()` between different analyses
+-   Use `set_vostokr_threads()` to configure threading before calculations
+-   For large datasets, use larger `voxel_size` values to reduce computation time
+-   Consider `day_step` and `minute_step` values to balance accuracy vs. speed
+-   Clear caches with `clear_vostokr_caches()` between different analyses
 
 ```{r eval=FALSE}
 # Example optimized configuration for large datasets
@@ -288,28 +308,28 @@ las_solar_fast <- calculate_solar_potential(
 
 The VOSTOK toolkit implements a sophisticated ray-casting algorithm that:
 
-1. **Builds an octree** spatial index of the 3D point cloud for efficient shadowing calculations
-2. **Calculates solar positions** using the SOLPOS algorithm for precise sun position tracking
-3. **Performs ray casting** from each point toward the sun to detect shadowing obstacles
-4. **Accumulates irradiance** over the specified time period, accounting for atmospheric conditions
+1.  **Builds an octree** spatial index of the 3D point cloud for efficient shadowing calculations
+2.  **Calculates solar positions** using the SOLPOS algorithm for precise sun position tracking
+3.  **Performs ray casting** from each point toward the sun to detect shadowing obstacles
+4.  **Accumulates irradiance** over the specified time period, accounting for atmospheric conditions
 
 ### Coordinate System Handling
 
 The package automatically:
 
-- Detects coordinate reference systems from LAS files
-- Extracts geographic coordinates (latitude/longitude)
-- Determines appropriate timezone based on longitude
-- Handles coordinate transformations as needed
+-   Detects coordinate reference systems from LAS files
+-   Extracts geographic coordinates (latitude/longitude)
+-   Determines appropriate timezone based on longitude
+-   Handles coordinate transformations as needed
 
 ### Performance Considerations
 
 Computation time depends on:
 
-- **Point cloud size**: Linear relationship with number of points
-- **Temporal resolution**: More time samples = longer computation
-- **Voxel size**: Smaller voxels = more detailed shadowing but slower processing
-- **Scene complexity**: Dense vegetation creates more shadow interactions
+-   **Point cloud size**: Linear relationship with number of points
+-   **Temporal resolution**: More time samples = longer computation
+-   **Voxel size**: Smaller voxels = more detailed shadowing but slower processing
+-   **Scene complexity**: Dense vegetation creates more shadow interactions
 
 ## Citation
 
@@ -321,9 +341,11 @@ citation("vostokR")
 
 ## References
 
-- Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101.
+-   Sánchez Meador, A.J. (2025): vostokR – Solar Potential Calculation for Point Clouds in R using VOSTOK. R package version 0.1.1. URL: <https://github.com/bi0m3trics/vostokR>
 
-- Original VOSTOK implementation: Comprehensive solar potential analysis toolkit for 3D point clouds with octree-based shadow casting.
+-   Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101. <https://doi.org/10.5194/isprs-annals-III-3-161-2016>
+
+-   Bechtold, S., & Höfle, B, (2020), "VOSTOK - The Voxel Octree Solar Toolkit", <https://doi.org/10.11588/DATA/QNA02B>, heiDATA, V1
 
 ## Session Information
 

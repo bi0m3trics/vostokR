@@ -2,6 +2,7 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -11,6 +12,34 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// compute_normals_cpp
+Rcpp::NumericMatrix compute_normals_cpp(const Eigen::Map<Eigen::MatrixXd> coords, const Eigen::Map<Eigen::MatrixXd> neighbors, bool always_up, int num_threads);
+RcppExport SEXP _vostokR_compute_normals_cpp(SEXP coordsSEXP, SEXP neighborsSEXP, SEXP always_upSEXP, SEXP num_threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type coords(coordsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type neighbors(neighborsSEXP);
+    Rcpp::traits::input_parameter< bool >::type always_up(always_upSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_normals_cpp(coords, neighbors, always_up, num_threads));
+    return rcpp_result_gen;
+END_RCPP
+}
+// compute_normals_with_features_cpp
+Rcpp::List compute_normals_with_features_cpp(const Eigen::Map<Eigen::MatrixXd> coords, const Eigen::Map<Eigen::MatrixXd> neighbors, bool always_up, int num_threads);
+RcppExport SEXP _vostokR_compute_normals_with_features_cpp(SEXP coordsSEXP, SEXP neighborsSEXP, SEXP always_upSEXP, SEXP num_threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type coords(coordsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type neighbors(neighborsSEXP);
+    Rcpp::traits::input_parameter< bool >::type always_up(always_upSEXP);
+    Rcpp::traits::input_parameter< int >::type num_threads(num_threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_normals_with_features_cpp(coords, neighbors, always_up, num_threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 // set_vostokr_threads
 void set_vostokr_threads(int n_threads);
 RcppExport SEXP _vostokR_set_vostokr_threads(SEXP n_threadsSEXP) {
@@ -94,6 +123,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_vostokR_compute_normals_cpp", (DL_FUNC) &_vostokR_compute_normals_cpp, 4},
+    {"_vostokR_compute_normals_with_features_cpp", (DL_FUNC) &_vostokR_compute_normals_with_features_cpp, 4},
     {"_vostokR_set_vostokr_threads", (DL_FUNC) &_vostokR_set_vostokr_threads, 1},
     {"_vostokR_get_vostokr_threads", (DL_FUNC) &_vostokR_get_vostokr_threads, 0},
     {"_vostokR_get_actual_vostokr_threads", (DL_FUNC) &_vostokR_get_actual_vostokr_threads, 0},

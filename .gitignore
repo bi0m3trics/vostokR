@@ -11,6 +11,15 @@ src/*.dll
 
 # Build directories
 inst/doc
+build/
+
+# CMake files (not needed for R package)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.vcxproj
+*.vcxproj.filters
+*.sln
 
 # OS files
 .DS_Store

@@ -13,7 +13,6 @@
 #include <stack>
 #include <vector>
 #include <Rcpp.h>
-#include "OctreeRaycaster.h"
 
 
 ShadowCalc::ShadowCalc(AbstractPointCloud& shadowCloud, double voxelSize) : m_octree(shadowCloud.getMin(), shadowCloud.getMax(), voxelSize) {

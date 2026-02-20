@@ -6,6 +6,7 @@ PKG_LIBS = -fopenmp -lgomp
 
 OBJECTS = RcppExports.o \
           rcpp_interface.o \
+          add_normals_fast.o \
           ShadowCalcOptimized.o \
           SpatialOptimizer.o \
           IrradianceCalc.o \

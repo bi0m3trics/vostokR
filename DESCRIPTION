@@ -1,8 +1,8 @@
 Package: vostokR
 Type: Package
 Title: Solar Potential Calculation for Point Clouds using VOSTOK
-Version: 0.1.1
-Date: 2025-09-01
+Version: 0.2.0
+Date: 2026-02-18
 Authors@R: c(
     person("Andrew J.", "Sanchez Meador", 
            email = "andrew.sanchezmeador@nau.edu", 
@@ -28,6 +28,7 @@ LazyData: true
 Imports:
     Rcpp (>= 1.0.11),
     RcppArmadillo (>= 0.12.0),
+    RcppEigen (>= 0.3.3.9.0),
     lidR (>= 4.0.0),
     data.table,
     terra,
@@ -39,7 +40,8 @@ Suggests:
     rmarkdown
 LinkingTo: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    RcppEigen
 Config/testthat/edition: 3
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 SystemRequirements: C++17

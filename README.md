@@ -1,8 +1,8 @@
-<img width="2000" height="512" alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/header.png" />
+<img src="https://github.com/bi0m3trics/vostokR/blob/main/images/header.png" alt="header" width="2000" height="512"/>
 
 ## vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
-<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/vostokR_SummaryOverview.png" align="right" width="100%" />
-vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
+
+<img src="https://github.com/bi0m3trics/vostokR/blob/main/images/vostokR_SummaryOverview.png" alt="header" align="right" width="100%"/> vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
 
 The package integrates seamlessly with the lidR ecosystem for LiDAR data processing and uses the SOLPOS library from the U.S. Department of Energy National Renewable Energy Laboratory for accurate solar position calculations.
 
@@ -15,7 +15,7 @@ This R package is based on the original VOSTOK toolkit developed by Bechtold and
 
 ## Citation
 
-When using this package, please cite both the R package and the original VOSTOK toolkit:
+When using this package, please cite both the R package, the original VOSTOK toolkit, and the corresponding publication:
 
 ``` bibtex
 @manual{vostokR,
@@ -34,6 +34,17 @@ When using this package, please cite both the R package and the original VOSTOK 
   version = {V1},
   doi = {10.11588/data/QNA02B},
   url = {https://doi.org/10.11588/data/QNA02B}
+}
+
+@article{bechtold2016helios,
+  author  = {Sebastian Bechtold and Bernhard Höfle},
+  title   = {HELIOS: A Multi-Purpose LiDAR Simulation Framework for Research, Planning and Training of Laser Scanning Operations with Airborne, Ground-Based Mobile and Stationary Platforms},
+  journal = {ISPRS Annals of the Photogrammetry, Remote Sensing and Spatial Information Sciences},
+  volume  = {III-3},
+  year    = {2016},
+  pages   = {161--168},
+  doi     = {10.5194/isprs-annals-III-3-161-2016},
+  url     = {https://doi.org/10.5194/isprs-annals-III-3-161-2016}
 }
 ```
 
@@ -138,8 +149,7 @@ vostokR v0.1.1 includes comprehensive performance optimizations delivering **2-3
 
 The output point cloud contains the original coordinates, normal vectors (nx, ny, nz), and a new `solar_potential` column with values in kWh/m²/year. Ground rasters show spatial patterns of solar potential across the landscape.
 
-<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/Example_Large.gif" align="right" width="100%" />
-<img alt="header" src="https://github.com/bi0m3trics/vostokR/blob/main/images/clipboard-2051438653.png" align="right" width="100%" />
+<img src="https://github.com/bi0m3trics/vostokR/blob/main/images/Example_Large.gif" alt="header" align="right" width="100%"/> <img src="https://github.com/bi0m3trics/vostokR/blob/main/images/clipboard-2051438653.png" alt="header" align="right" width="100%"/>
 
 ## Implementation Details
 
@@ -166,6 +176,8 @@ When using this package, please cite the original VOSTOK work:
 Sánchez Meador, A.J. (2025): vostokR – Solar Potential Calculation for Point Clouds in R using VOSTOK. R package version 0.1.1. URL: <https://github.com/bi0m3trics/vostokR>
 
 Bechtold, S. & Höfle, B. (2020): VOSTOK - The Voxel Octree Solar Toolkit. heiDATA, V1. DOI: [10.11588/data/QNA02B](https://doi.org/10.11588/data/QNA02B).
+
+Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101. URL: <https://doi.org/10.5194/isprs-annals-III-3-161-2016>
 
 ## License
 

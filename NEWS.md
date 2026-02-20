@@ -1,6 +1,6 @@
 # vostokR News
 
-## vostokR v0.1.1 (Release date: 2025-09-01)
+## vostokR v0.2.0 (Release date: 2025-09-01)
 
 This update implements comprehensive parallelization and performance optimizations that deliver 2-3x faster processing for solar potential calculations while maintaining full accuracy.
 
@@ -65,6 +65,9 @@ This update implements comprehensive parallelization and performance optimizatio
 • Resolved race conditions in multi-threaded processing
 • Improved error handling and edge case management
 • Better integration with lidR's parallel processing workflow
+• Fixed terra plot warnings by using correct `plg` parameter for legend configuration
+• Removed legacy standalone application code (main.cpp, ProjectConfig, SimpleTextPointCloud, OctreeRaycaster)
+• Cleaned up unused dependencies and includes for better build reliability
 
 ---
 
