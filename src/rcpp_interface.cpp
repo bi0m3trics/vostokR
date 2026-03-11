@@ -210,7 +210,7 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
     
-    Rcpp::Rcout << "Solar potential calculation completed in " << duration.count() << " ms" << std::endl;
+    // Rcpp::Rcout << "Solar potential calculation completed in " << duration.count() << " ms" << std::endl;
     
     return solar_potential;
 }

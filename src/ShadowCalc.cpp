@@ -18,7 +18,7 @@
 ShadowCalc::ShadowCalc(AbstractPointCloud& shadowCloud, double voxelSize) : m_octree(shadowCloud.getMin(), shadowCloud.getMax(), voxelSize) {
 
 	//########## BEGIN Read input file for second time to build octree #################
-	Rcpp::Rcout << "Building octree... " << std::flush;
+	// Rcpp::Rcout << "Building octree... " << std::flush;
 
 	shadowCloud.resetCursor();
 
@@ -46,7 +46,7 @@ ShadowCalc::ShadowCalc(AbstractPointCloud& shadowCloud, double voxelSize) : m_oc
 		//############### END Insert point into octree ###############
 	}
 
-	Rcpp::Rcout << "finished." << std::endl << std::endl << std::flush;
+	// Rcpp::Rcout << "finished." << std::endl << std::endl << std::flush;
 
 }
 

@@ -24,6 +24,7 @@ calculate_solar_potential(las, ...)
   timezone = NULL,
   n_threads = NULL,
   clear_cache = FALSE,
+  verbose = FALSE,
   ...
 )
 
@@ -74,6 +75,8 @@ calculate_solar_potential(las, ...)
 \item{n_threads}{Numeric. Number of OpenMP threads to use (default: auto-detect)}
 
 \item{clear_cache}{Logical. Clear performance caches before calculation (default: FALSE)}
+
+\item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \value{
 LAS object with added column for solar potential in Wh/m^2/day
@@ -85,39 +88,24 @@ surrounding points. Location information (lat/lon/timezone) is auto-detected
 from the CRS when possible.
 }
 \examples{
-\dontrun{
+\donttest{
 library(lidR)
 library(vostokR)
-library(terra)
 
-# Single LAS file example using included test data
+# Load test data
 LASfile <- system.file("extdata", "test.laz", package="vostokR")
 las <- readLAS(LASfile)
-
-# Calculate normals if not present
 las <- add_normals(las, k = 10)
 
-# Example 1: Auto-detect location from CRS
-las_solar <- calculate_solar_potential(las, 
+# Quick single-day calculation
+las_solar <- calculate_solar_potential(las,
                                      year = 2025,
-                                     start_date = "2025-06-01",
-                                     end_date = "2025-08-31")
-
-# Example 2: Manual location specification with threading control
-las_solar <- calculate_solar_potential(las, 
-                                     year = 2025,
-                                     day_start = 150,
-                                     day_end = 250,
-                                     lat = 33.4484,
-                                     lon = -112.0740,
-                                     timezone = -7,
-                                     n_threads = 4)
-
-# Plot solar potential on point cloud
-plot(las_solar, color = "solar_potential", pal = heat.colors(100))
-
-# Create ground raster and plot
-ground_raster <- solar_ground_raster(las_solar, res = 1)
-plot(ground_raster, main = "Ground Solar Potential")
+                                     day_start = 172,
+                                     day_end = 172,
+                                     day_step = 1,
+                                     minute_step = 60,
+                                     lat = 35.0,
+                                     lon = -111.0,
+                                     timezone = -7)
 }
 }

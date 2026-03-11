@@ -4,10 +4,12 @@
 \alias{set_vostokr_threads}
 \title{Set VostokR OpenMP Thread Count}
 \usage{
-set_vostokr_threads(n_threads = NULL)
+set_vostokr_threads(n_threads = NULL, verbose = FALSE)
 }
 \arguments{
 \item{n_threads}{Integer. Number of threads to use. If NULL, auto-detect based on available cores and lidR settings.}
+
+\item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \description{
 Control the number of OpenMP threads used by VostokR calculations

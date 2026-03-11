@@ -24,20 +24,16 @@ License: GPL (>= 3) + file LICENSE
 URL: https://github.com/bi0m3trics/vostokR
 BugReports: https://github.com/bi0m3trics/vostokR/issues
 Encoding: UTF-8
-LazyData: true
 Imports:
     Rcpp (>= 1.0.11),
     RcppArmadillo (>= 0.12.0),
-    RcppEigen (>= 0.3.3.9.0),
     lidR (>= 4.0.0),
     data.table,
     terra,
     sf (>= 1.0.0),
     methods
 Suggests:
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown
+    testthat (>= 3.0.0)
 LinkingTo: 
     Rcpp,
     RcppArmadillo,

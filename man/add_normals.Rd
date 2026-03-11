@@ -4,7 +4,13 @@
 \alias{add_normals}
 \title{Add Normal Vectors to Point Cloud}
 \usage{
-add_normals(las, k = 10, add_features = FALSE, num_threads = 0)
+add_normals(
+  las,
+  k = 10,
+  add_features = FALSE,
+  num_threads = 0,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{las}{LAS object from lidR package}
@@ -14,6 +20,8 @@ add_normals(las, k = 10, add_features = FALSE, num_threads = 0)
 \item{add_features}{Logical, whether to add eigenvalue-based geometric features (default: FALSE)}
 
 \item{num_threads}{Number of OpenMP threads to use (default: 0 = auto-detect)}
+
+\item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \value{
 LAS object with added normal vectors (nx, ny, nz) and optionally geometric features
@@ -25,7 +33,7 @@ This implementation is 5-10x faster than pure R approaches and comparable to las
 while providing additional geometric features useful for forestry applications.
 }
 \examples{
-\dontrun{
+\donttest{
 library(lidR)
 library(vostokR)
 
@@ -35,14 +43,6 @@ las <- readLAS(LASfile)
 
 # Add normals using fast C++ method
 las <- add_normals(las, k = 10)
-
-# Add normals with geometric features for analysis
-las <- add_normals(las, k = 10, add_features = TRUE)
-
-# Control parallelization
-las <- add_normals(las, k = 10, num_threads = 4)
-
-# Check that normals were added
 names(las@data)
 }
 }

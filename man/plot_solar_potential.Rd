@@ -15,8 +15,5 @@ plot_solar_potential(las, ...)
 Plots solar potential values directly on the point cloud using lidR's native plotting
 }
 \examples{
-\dontrun{
-# Plot solar potential on point cloud
-plot(las_solar, color = "solar_potential", pal = heat.colors(100))
-}
+# plot_solar_potential(las_solar)
 }

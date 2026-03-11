@@ -20,44 +20,30 @@
 #' @param timezone Numeric. Time zone offset from UTC (auto-detected from CRS if NULL)
 #' @param n_threads Numeric. Number of OpenMP threads to use (default: auto-detect)
 #' @param clear_cache Logical. Clear performance caches before calculation (default: FALSE)
+#' @param verbose Logical. Print informational messages (default: FALSE)
 #' @param ... Additional arguments passed to other methods
 #' @return LAS object with added column for solar potential in Wh/m^2/day
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(lidR)
 #' library(vostokR)
-#' library(terra)
 #' 
-#' # Single LAS file example using included test data
+#' # Load test data
 #' LASfile <- system.file("extdata", "test.laz", package="vostokR")
 #' las <- readLAS(LASfile)
-#' 
-#' # Calculate normals if not present
 #' las <- add_normals(las, k = 10)
 #' 
-#' # Example 1: Auto-detect location from CRS
-#' las_solar <- calculate_solar_potential(las, 
+#' # Quick single-day calculation
+#' las_solar <- calculate_solar_potential(las,
 #'                                      year = 2025,
-#'                                      start_date = "2025-06-01",
-#'                                      end_date = "2025-08-31")
-#' 
-#' # Example 2: Manual location specification with threading control
-#' las_solar <- calculate_solar_potential(las, 
-#'                                      year = 2025,
-#'                                      day_start = 150,
-#'                                      day_end = 250,
-#'                                      lat = 33.4484,
-#'                                      lon = -112.0740,
-#'                                      timezone = -7,
-#'                                      n_threads = 4)
-#' 
-#' # Plot solar potential on point cloud
-#' plot(las_solar, color = "solar_potential", pal = heat.colors(100))
-#' 
-#' # Create ground raster and plot
-#' ground_raster <- solar_ground_raster(las_solar, res = 1)
-#' plot(ground_raster, main = "Ground Solar Potential")
+#'                                      day_start = 172,
+#'                                      day_end = 172,
+#'                                      day_step = 1,
+#'                                      minute_step = 60,
+#'                                      lat = 35.0,
+#'                                      lon = -111.0,
+#'                                      timezone = -7)
 #' }
 #' @name calculate_solar_potential
 NULL
@@ -136,8 +122,9 @@ date_to_day_numbers <- function(start_date, end_date, year) {
 #' Control the number of OpenMP threads used by VostokR calculations
 #'
 #' @param n_threads Integer. Number of threads to use. If NULL, auto-detect based on available cores and lidR settings.
+#' @param verbose Logical. Print informational messages (default: FALSE)
 #' @export
-set_vostokr_threads <- function(n_threads = NULL) {
+set_vostokr_threads <- function(n_threads = NULL, verbose = FALSE) {
     if (is.null(n_threads)) {
         # Auto-coordinate with lidR
         lidr_threads <- get_lidr_threads()
@@ -146,7 +133,9 @@ set_vostokr_threads <- function(n_threads = NULL) {
     }
     
     .Call("_vostokR_set_vostokr_threads", as.integer(n_threads))
-    message("VostokR threads set to: ", n_threads)
+    if (verbose) {
+        message("VostokR threads set to: ", n_threads)
+    }
 }
 
 #' Get Current VostokR Thread Count
@@ -169,10 +158,13 @@ get_vostokr_performance_info <- function() {
 #'
 #' Clears internal SOLPOS and shadow caches to free memory
 #'
+#' @param verbose Logical. Print informational messages (default: FALSE)
 #' @export
-clear_vostokr_caches <- function() {
+clear_vostokr_caches <- function(verbose = FALSE) {
     .Call("_vostokR_clear_vostokr_caches")
-    message("VostokR caches cleared")
+    if (verbose) {
+        message("VostokR caches cleared")
+    }
 }
 
 #' @rdname calculate_solar_potential
@@ -198,6 +190,7 @@ calculate_solar_potential.LAS <- function(las,
                                        timezone = NULL,
                                        n_threads = NULL,
                                        clear_cache = FALSE,
+                                       verbose = FALSE,
                                        ...) {
     
     # Auto-coordinate threading with lidR
@@ -218,10 +211,12 @@ calculate_solar_potential.LAS <- function(las,
     
     # Print performance info
     perf_info <- get_vostokr_performance_info()
-    message("VostokR Performance Info:")
-    message("  OpenMP enabled: ", perf_info$openmp_enabled)
-    message("  Using threads: ", perf_info$current_threads, "/", perf_info$max_threads)
-    message("  lidR threads: ", get_lidr_threads())
+    if (verbose) {
+        message("VostokR Performance Info:")
+        message("  OpenMP enabled: ", perf_info$openmp_enabled)
+        message("  Using threads: ", perf_info$current_threads, "/", perf_info$max_threads)
+        message("  lidR threads: ", get_lidr_threads())
+    }
     
     # Auto-detect CRS information if not provided
     if (is.null(lat) || is.null(lon) || is.null(timezone)) {
@@ -236,7 +231,9 @@ calculate_solar_potential.LAS <- function(las,
             stop("Could not extract lat/lon/timezone from CRS. Please provide these parameters explicitly.")
         }
         
-        message("Auto-detected from CRS: lat=", round(lat, 4), ", lon=", round(lon, 4), ", timezone=", timezone)
+        if (verbose) {
+            message("Auto-detected from CRS: lat=", round(lat, 4), ", lon=", round(lon, 4), ", timezone=", timezone)
+        }
     }
     
     # Handle date range conversion
@@ -247,7 +244,9 @@ calculate_solar_potential.LAS <- function(las,
         day_nums <- date_to_day_numbers(start_date, end_date, year)
         day_start <- day_nums$day_start
         day_end <- day_nums$day_end
-        message("Date range ", start_date, " to ", end_date, " converted to days ", day_start, "-", day_end)
+        if (verbose) {
+            message("Date range ", start_date, " to ", end_date, " converted to days ", day_start, "-", day_end)
+        }
     } else {
         # Use default values if not provided
         if (is.null(day_start)) day_start <- 1
@@ -368,10 +367,7 @@ calculate_solar_potential.LAScatalog <- function(las,
 #' @param ... Additional arguments passed to lidR::plot()
 #' @export
 #' @examples
-#' \dontrun{
-#' # Plot solar potential on point cloud
-#' plot(las_solar, color = "solar_potential", pal = heat.colors(100))
-#' }
+#' # plot_solar_potential(las_solar)
 plot_solar_potential <- function(las, ...) {
     if (!"solar_potential" %in% names(las@data)) {
         stop("LAS object must contain solar_potential values")
@@ -389,26 +385,21 @@ plot_solar_potential <- function(las, ...) {
 #' @param res Numeric. Resolution of output raster (default: 1)
 #' @param ground_class Numeric. Classification code for ground points (default: 2)
 #' @param use_all_points Logical. If TRUE and no ground points found, use all points (default: FALSE)
+#' @param verbose Logical. Print informational messages (default: FALSE)
 #' @return SpatRaster object from terra
 #' @export
 #' @examples
-#' \dontrun{
-#' library(lidR)
-#' library(vostokR)
-#' library(terra)
-#' 
-#' # After calculating solar potential
-#' solar_raster <- solar_ground_raster(las_solar, res = 0.5)
-#' plot(solar_raster, main = "Ground Solar Potential")
-#' }
-solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points = FALSE) {
+#' # solar_raster <- solar_ground_raster(las_solar, res = 0.5)
+solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points = FALSE, verbose = FALSE) {
     if (!"solar_potential" %in% names(las@data)) {
         stop("LAS object must contain solar_potential values")
     }
     
     # Check what classification values are actually present
     class_values <- unique(las@data$Classification)
-    cat("Available classification values:", paste(class_values, collapse = ", "), "\n")
+    if (verbose) {
+        cat("Available classification values:", paste(class_values, collapse = ", "), "\n")
+    }
     
     # Filter ground points
     ground_points <- lidR::filter_poi(las, Classification == ground_class)
@@ -425,9 +416,11 @@ solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points =
         }
     }
     
-    cat("Using", nrow(ground_points@data), "points for raster creation\n")
-    cat("Solar potential range:", 
-        round(range(ground_points@data$solar_potential), 2), "kWh/m^2/year\n")
+    if (verbose) {
+        cat("Using", nrow(ground_points@data), "points for raster creation\n")
+        cat("Solar potential range:", 
+            round(range(ground_points@data$solar_potential), 2), "kWh/m^2/year\n")
+    }
     
     # Create terra raster directly from point data
     # Convert LAS to sf points
@@ -450,7 +443,7 @@ solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points =
     # Check if raster has values
     if (all(is.na(terra::values(solar_raster)))) {
         warning("Raster contains no values. Check resolution or point distribution.")
-    } else {
+    } else if (verbose) {
         cat("Raster created successfully with", terra::ncell(solar_raster), "cells\n")
         cat("Raster value range:", round(range(terra::values(solar_raster), na.rm = TRUE), 2), "\n")
     }

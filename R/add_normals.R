@@ -9,12 +9,13 @@
 #' @param k Number of neighbors to use for normal estimation (default: 10)
 #' @param add_features Logical, whether to add eigenvalue-based geometric features (default: FALSE)
 #' @param num_threads Number of OpenMP threads to use (default: 0 = auto-detect)
+#' @param verbose Logical. Print informational messages (default: FALSE)
 #' @return LAS object with added normal vectors (nx, ny, nz) and optionally geometric features
 #' @export
 #' @importFrom lidR add_attribute knn readLAS
 #' @importFrom stats na.omit
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(lidR)
 #' library(vostokR)
 #' 
@@ -24,18 +25,10 @@
 #' 
 #' # Add normals using fast C++ method
 #' las <- add_normals(las, k = 10)
-#' 
-#' # Add normals with geometric features for analysis
-#' las <- add_normals(las, k = 10, add_features = TRUE)
-#' 
-#' # Control parallelization
-#' las <- add_normals(las, k = 10, num_threads = 4)
-#' 
-#' # Check that normals were added
 #' names(las@data)
 #' }
 #' @seealso \code{\link{calculate_solar_potential}} for solar potential calculation
-add_normals <- function(las, k = 10, add_features = FALSE, num_threads = 0) {
+add_normals <- function(las, k = 10, add_features = FALSE, num_threads = 0, verbose = FALSE) {
     if (!inherits(las, "LAS")) {
         stop("Input must be a LAS object from lidR package")
     }
@@ -87,11 +80,13 @@ add_normals <- function(las, k = 10, add_features = FALSE, num_threads = 0) {
         las <- lidR::add_attribute(las, features[,3], "sphericity") 
         las <- lidR::add_attribute(las, features[,4], "curvature")
         
-        message("Added geometric features useful for forestry analysis:")
-        message("  - linearity: measure of linear structures (branches, stems)")
-        message("  - planarity: measure of planar structures (leaves, bark)")
-        message("  - sphericity: measure of 3D/volumetric structures") 
-        message("  - curvature: measure of surface curvature")
+        if (verbose) {
+            message("Added geometric features useful for forestry analysis:")
+            message("  - linearity: measure of linear structures (branches, stems)")
+            message("  - planarity: measure of planar structures (leaves, bark)")
+            message("  - sphericity: measure of 3D/volumetric structures") 
+            message("  - curvature: measure of surface curvature")
+        }
     } else {
         # Compute normals only (faster)
         normals <- compute_normals_cpp(

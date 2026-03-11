@@ -4,7 +4,10 @@
 \alias{clear_vostokr_caches}
 \title{Clear VostokR Performance Caches}
 \usage{
-clear_vostokr_caches()
+clear_vostokr_caches(verbose = FALSE)
+}
+\arguments{
+\item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \description{
 Clears internal SOLPOS and shadow caches to free memory

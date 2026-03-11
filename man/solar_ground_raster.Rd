@@ -4,7 +4,13 @@
 \alias{solar_ground_raster}
 \title{Convert Solar Potential Ground Points to Raster}
 \usage{
-solar_ground_raster(las, res = 1, ground_class = 2, use_all_points = FALSE)
+solar_ground_raster(
+  las,
+  res = 1,
+  ground_class = 2,
+  use_all_points = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{las}{LAS object with solar potential values}
@@ -14,6 +20,8 @@ solar_ground_raster(las, res = 1, ground_class = 2, use_all_points = FALSE)
 \item{ground_class}{Numeric. Classification code for ground points (default: 2)}
 
 \item{use_all_points}{Logical. If TRUE and no ground points found, use all points (default: FALSE)}
+
+\item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \value{
 SpatRaster object from terra
@@ -22,13 +30,5 @@ SpatRaster object from terra
 Extracts ground points from solar potential results and converts to terra SpatRaster
 }
 \examples{
-\dontrun{
-library(lidR)
-library(vostokR)
-library(terra)
-
-# After calculating solar potential
-solar_raster <- solar_ground_raster(las_solar, res = 0.5)
-plot(solar_raster, main = "Ground Solar Potential")
-}
+# solar_raster <- solar_ground_raster(las_solar, res = 0.5)
 }

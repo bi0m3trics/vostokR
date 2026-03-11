@@ -30,3 +30,6 @@ Thumbs.db
 *.o
 *.o
 images/vostokR_SummaryOverview.psd
+vostokR_MEE_Application.md
+vostokR_0.2.0.tar.gz
+cran-comments.md

@@ -9,3 +9,8 @@
 ^\.github$
 ^\.cmake$
 ^vignettes$
+^ignoreme$
+^cran-comments\.md$
+^README\.md$
+^vostokR_MEE_Application\.md$
+^NEWS\.md$
