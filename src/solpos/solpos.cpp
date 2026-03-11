@@ -88,6 +88,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <R_ext/Print.h>
 #include"solpos00.h"
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -868,40 +869,40 @@ static void tilt(struct posdata *pdat) {
  *----------------------------------------------------------------------------*/
 void S_decode(long code, struct posdata *pdat) {
 	if (code & (1L << S_YEAR_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the year: %d [1950-2050]\n", pdat->year);
+		REprintf("S_decode ==> Please fix the year: %d [1950-2050]\n", pdat->year);
 	if (code & (1L << S_MONTH_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the month: %d\n", pdat->month);
+		REprintf("S_decode ==> Please fix the month: %d\n", pdat->month);
 	if (code & (1L << S_DAY_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the day-of-month: %d\n", pdat->day);
+		REprintf("S_decode ==> Please fix the day-of-month: %d\n", pdat->day);
 	if (code & (1L << S_DOY_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the day-of-year: %d\n", pdat->daynum);
+		REprintf("S_decode ==> Please fix the day-of-year: %d\n", pdat->daynum);
 	if (code & (1L << S_HOUR_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the hour: %d\n", pdat->hour);
+		REprintf("S_decode ==> Please fix the hour: %d\n", pdat->hour);
 	if (code & (1L << S_MINUTE_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the minute: %d\n", pdat->minute);
+		REprintf("S_decode ==> Please fix the minute: %d\n", pdat->minute);
 	if (code & (1L << S_SECOND_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the second: %d\n", pdat->second);
+		REprintf("S_decode ==> Please fix the second: %d\n", pdat->second);
 	if (code & (1L << S_TZONE_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the time zone: %f\n", pdat->timezone);
+		REprintf("S_decode ==> Please fix the time zone: %f\n", pdat->timezone);
 	if (code & (1L << S_INTRVL_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the interval: %d\n", pdat->interval);
+		REprintf("S_decode ==> Please fix the interval: %d\n", pdat->interval);
 	if (code & (1L << S_LAT_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the latitude: %f\n", pdat->latitude);
+		REprintf("S_decode ==> Please fix the latitude: %f\n", pdat->latitude);
 	if (code & (1L << S_LON_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the longitude: %f\n", pdat->longitude);
+		REprintf("S_decode ==> Please fix the longitude: %f\n", pdat->longitude);
 	if (code & (1L << S_TEMP_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the temperature: %f\n", pdat->temp);
+		REprintf("S_decode ==> Please fix the temperature: %f\n", pdat->temp);
 	if (code & (1L << S_PRESS_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the pressure: %f\n", pdat->press);
+		REprintf("S_decode ==> Please fix the pressure: %f\n", pdat->press);
 	if (code & (1L << S_TILT_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the tilt: %f\n", pdat->tilt);
+		REprintf("S_decode ==> Please fix the tilt: %f\n", pdat->tilt);
 	if (code & (1L << S_ASPECT_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the aspect: %f\n", pdat->aspect);
+		REprintf("S_decode ==> Please fix the aspect: %f\n", pdat->aspect);
 	if (code & (1L << S_SBWID_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the shadowband width: %f\n", pdat->sbwid);
+		REprintf("S_decode ==> Please fix the shadowband width: %f\n", pdat->sbwid);
 	if (code & (1L << S_SBRAD_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the shadowband radius: %f\n", pdat->sbrad);
+		REprintf("S_decode ==> Please fix the shadowband radius: %f\n", pdat->sbrad);
 	if (code & (1L << S_SBSKY_ERROR))
-		fprintf(stderr, "S_decode ==> Please fix the shadowband sky factor: %f\n", pdat->sbsky);
+		REprintf("S_decode ==> Please fix the shadowband sky factor: %f\n", pdat->sbsky);
 }
 

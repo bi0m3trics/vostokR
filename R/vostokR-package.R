@@ -38,5 +38,4 @@
 #' @importFrom Rcpp sourceCpp
 #' @importFrom methods is
 #' @importFrom stats setNames
-#' @import RcppArmadillo
 "_PACKAGE"
