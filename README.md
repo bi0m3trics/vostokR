@@ -179,6 +179,8 @@ Bechtold, S. & Höfle, B. (2020): VOSTOK - The Voxel Octree Solar Toolkit. heiDA
 
 Bechtold, S., & Höfle, B. (2016). HELIOS: A multi-purpose LiDAR simulation framework for research, planning and training of laser scanning operations with airborne, ground-based mobile and stationary platforms. *ISPRS Journal of Photogrammetry and Remote Sensing*, 115, 86-101. URL: <https://doi.org/10.5194/isprs-annals-III-3-161-2016>
 
+This package exists thanks to an unexpected two-week window created by a bout of shingles. Turns out enforced couch time is excellent for writing R packages. 
+
 ## License
 
 This package is licensed under the GPL (\>= 2) license.
