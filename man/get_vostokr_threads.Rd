@@ -7,8 +7,10 @@
 get_vostokr_threads()
 }
 \value{
-Integer. Current number of OpenMP threads
+An integer scalar indicating the current number of OpenMP threads
+used by VostokR.
 }
 \description{
-Get Current VostokR Thread Count
+Returns the number of OpenMP threads currently configured for VostokR
+parallel computations.
 }

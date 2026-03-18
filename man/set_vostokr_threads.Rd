@@ -11,6 +11,9 @@ set_vostokr_threads(n_threads = NULL, verbose = FALSE)
 
 \item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
+\value{
+No return value, called for side effects (sets thread count).
+}
 \description{
 Control the number of OpenMP threads used by VostokR calculations
 }

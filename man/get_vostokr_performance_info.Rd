@@ -7,8 +7,14 @@
 get_vostokr_performance_info()
 }
 \value{
-List with OpenMP status and thread information
+A named list with the following elements:
+\describe{
+  \item{openmp_enabled}{Logical. Whether OpenMP support is available.}
+  \item{max_threads}{Integer. Maximum number of threads available.}
+  \item{current_threads}{Integer. Number of threads currently in use.}
+}
 }
 \description{
-Get VostokR Performance Information
+Returns a named list containing information about OpenMP availability
+and thread configuration for VostokR.
 }

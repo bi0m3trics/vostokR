@@ -123,6 +123,7 @@ date_to_day_numbers <- function(start_date, end_date, year) {
 #'
 #' @param n_threads Integer. Number of threads to use. If NULL, auto-detect based on available cores and lidR settings.
 #' @param verbose Logical. Print informational messages (default: FALSE)
+#' @return No return value, called for side effects (sets thread count).
 #' @export
 set_vostokr_threads <- function(n_threads = NULL, verbose = FALSE) {
     if (is.null(n_threads)) {
@@ -140,7 +141,11 @@ set_vostokr_threads <- function(n_threads = NULL, verbose = FALSE) {
 
 #' Get Current VostokR Thread Count
 #'
-#' @return Integer. Current number of OpenMP threads
+#' Returns the number of OpenMP threads currently configured for VostokR
+#' parallel computations.
+#'
+#' @return An integer scalar indicating the current number of OpenMP threads
+#' used by VostokR.
 #' @export
 get_vostokr_threads <- function() {
     .Call("_vostokR_get_vostokr_threads")
@@ -148,7 +153,15 @@ get_vostokr_threads <- function() {
 
 #' Get VostokR Performance Information
 #'
-#' @return List with OpenMP status and thread information
+#' Returns a named list containing information about OpenMP availability
+#' and thread configuration for VostokR.
+#'
+#' @return A named list with the following elements:
+#' \describe{
+#'   \item{openmp_enabled}{Logical. Whether OpenMP support is available.}
+#'   \item{max_threads}{Integer. Maximum number of threads available.}
+#'   \item{current_threads}{Integer. Number of threads currently in use.}
+#' }
 #' @export
 get_vostokr_performance_info <- function() {
     .Call("_vostokR_get_vostokr_performance_info")
@@ -159,6 +172,7 @@ get_vostokr_performance_info <- function() {
 #' Clears internal SOLPOS and shadow caches to free memory
 #'
 #' @param verbose Logical. Print informational messages (default: FALSE)
+#' @return No return value, called for side effects (clears internal caches).
 #' @export
 clear_vostokr_caches <- function(verbose = FALSE) {
     .Call("_vostokR_clear_vostokr_caches")
@@ -365,9 +379,21 @@ calculate_solar_potential.LAScatalog <- function(las,
 #'
 #' @param las LAS object with solar potential values
 #' @param ... Additional arguments passed to lidR::plot()
+#' @return No return value, called for side effects (produces a plot).
 #' @export
 #' @examples
-#' # plot_solar_potential(las_solar)
+#' \donttest{
+#' library(lidR)
+#' library(vostokR)
+#' LASfile <- system.file("extdata", "test.laz", package = "vostokR")
+#' las <- readLAS(LASfile)
+#' las <- add_normals(las, k = 10)
+#' las_solar <- calculate_solar_potential(las,
+#'   year = 2025, day_start = 172, day_end = 172,
+#'   day_step = 1, minute_step = 60,
+#'   lat = 35.0, lon = -111.0, timezone = -7)
+#' plot_solar_potential(las_solar)
+#' }
 plot_solar_potential <- function(las, ...) {
     if (!"solar_potential" %in% names(las@data)) {
         stop("LAS object must contain solar_potential values")
@@ -386,10 +412,24 @@ plot_solar_potential <- function(las, ...) {
 #' @param ground_class Numeric. Classification code for ground points (default: 2)
 #' @param use_all_points Logical. If TRUE and no ground points found, use all points (default: FALSE)
 #' @param verbose Logical. Print informational messages (default: FALSE)
-#' @return SpatRaster object from terra
+#' @return A \code{SpatRaster} object (from the \pkg{terra} package) containing
+#' mean solar potential values (Wh/m^2/day) for ground points, gridded at the
+#' specified resolution. Returns \code{NULL} if no ground points are found and
+#' \code{use_all_points} is \code{FALSE}.
 #' @export
 #' @examples
-#' # solar_raster <- solar_ground_raster(las_solar, res = 0.5)
+#' \donttest{
+#' library(lidR)
+#' library(vostokR)
+#' LASfile <- system.file("extdata", "test.laz", package = "vostokR")
+#' las <- readLAS(LASfile)
+#' las <- add_normals(las, k = 10)
+#' las_solar <- calculate_solar_potential(las,
+#'   year = 2025, day_start = 172, day_end = 172,
+#'   day_step = 1, minute_step = 60,
+#'   lat = 35.0, lon = -111.0, timezone = -7)
+#' solar_raster <- solar_ground_raster(las_solar, res = 0.5)
+#' }
 solar_ground_raster <- function(las, res = 1, ground_class = 2, use_all_points = FALSE, verbose = FALSE) {
     if (!"solar_potential" %in% names(las@data)) {
         stop("LAS object must contain solar_potential values")

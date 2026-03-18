@@ -24,11 +24,25 @@ solar_ground_raster(
 \item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
 \value{
-SpatRaster object from terra
+A \code{SpatRaster} object (from the \pkg{terra} package) containing
+mean solar potential values (Wh/m^2/day) for ground points, gridded at the
+specified resolution. Returns \code{NULL} if no ground points are found and
+\code{use_all_points} is \code{FALSE}.
 }
 \description{
 Extracts ground points from solar potential results and converts to terra SpatRaster
 }
 \examples{
-# solar_raster <- solar_ground_raster(las_solar, res = 0.5)
+\donttest{
+library(lidR)
+library(vostokR)
+LASfile <- system.file("extdata", "test.laz", package = "vostokR")
+las <- readLAS(LASfile)
+las <- add_normals(las, k = 10)
+las_solar <- calculate_solar_potential(las,
+  year = 2025, day_start = 172, day_end = 172,
+  day_step = 1, minute_step = 60,
+  lat = 35.0, lon = -111.0, timezone = -7)
+solar_raster <- solar_ground_raster(las_solar, res = 0.5)
+}
 }

@@ -11,9 +11,23 @@ plot_solar_potential(las, ...)
 
 \item{...}{Additional arguments passed to lidR::plot()}
 }
+\value{
+No return value, called for side effects (produces a plot).
+}
 \description{
 Plots solar potential values directly on the point cloud using lidR's native plotting
 }
 \examples{
-# plot_solar_potential(las_solar)
+\donttest{
+library(lidR)
+library(vostokR)
+LASfile <- system.file("extdata", "test.laz", package = "vostokR")
+las <- readLAS(LASfile)
+las <- add_normals(las, k = 10)
+las_solar <- calculate_solar_potential(las,
+  year = 2025, day_start = 172, day_end = 172,
+  day_step = 1, minute_step = 60,
+  lat = 35.0, lon = -111.0, timezone = -7)
+plot_solar_potential(las_solar)
+}
 }

@@ -9,6 +9,9 @@ clear_vostokr_caches(verbose = FALSE)
 \arguments{
 \item{verbose}{Logical. Print informational messages (default: FALSE)}
 }
+\value{
+No return value, called for side effects (clears internal caches).
+}
 \description{
 Clears internal SOLPOS and shadow caches to free memory
 }
