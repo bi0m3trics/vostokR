@@ -29,8 +29,8 @@ Rcpp::NumericMatrix compute_normals_cpp(
     bool always_up = true,
     int num_threads = 0
 ) {
-  const int n_points = neighbors.rows();
-  const int k = neighbors.cols();
+  const int n_points = static_cast<int>(neighbors.rows());
+  const int k         = static_cast<int>(neighbors.cols());
   
   // Set number of threads
 #ifdef _OPENMP
@@ -126,8 +126,8 @@ Rcpp::List compute_normals_with_features_cpp(
     bool always_up = true,
     int num_threads = 0
 ) {
-  const int n_points = neighbors.rows();
-  const int k = neighbors.cols();
+  const int n_points = static_cast<int>(neighbors.rows());
+  const int k         = static_cast<int>(neighbors.cols());
   
   // Set number of threads
 #ifdef _OPENMP

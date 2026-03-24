@@ -14,7 +14,6 @@
 #include "pointCloud/LidrPointCloud.h"
 #include <vector>
 #include <algorithm>
-#include <chrono>
 
 using namespace Rcpp;
 
@@ -96,8 +95,6 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
                                          double lon,
                                          double timezone) {
     
-    auto start_time = std::chrono::high_resolution_clock::now();
-    
     int n_points = coords.nrow();
     NumericVector solar_potential(n_points, 0.0);
     
@@ -118,26 +115,24 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
     // SOLPOS cache for temporal coherence
     SolposCache& solpos_cache = SolposCache::getInstance();
     
-    // Get current thread setting
+    // Hierarchical parallelization: parallel over time, then space
 #ifdef _OPENMP
     int num_threads = omp_get_max_threads();
-#else
-    int num_threads = 1;
-#endif
-    
-    // Hierarchical parallelization: parallel over time, then space
     #pragma omp parallel num_threads(num_threads)
+#endif
     {
         // Each thread gets its own SOLPOS struct
         posdata thread_solpos;
         S_init(&thread_solpos);
         thread_solpos.year = year;
-        thread_solpos.latitude = lat;
-        thread_solpos.longitude = lon;
-        thread_solpos.timezone = timezone;
+        thread_solpos.latitude  = static_cast<float>(lat);
+        thread_solpos.longitude = static_cast<float>(lon);
+        thread_solpos.timezone  = static_cast<float>(timezone);
         
         // Parallel over days
+    #ifdef _OPENMP
         #pragma omp for schedule(dynamic)
+    #endif
         for(int day = day_start; day <= day_end; day += day_step) {
             thread_solpos.daynum = day;
             
@@ -147,8 +142,8 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
             thread_solpos.second = 0;
             S_decode(S_solpos(&thread_solpos), &thread_solpos);
             
-            int sunrise_minute = thread_solpos.sretr;
-            int sunset_minute = thread_solpos.ssetr;
+            int sunrise_minute = static_cast<int>(thread_solpos.sretr);
+            int sunset_minute  = static_cast<int>(thread_solpos.ssetr);
             
             // Loop through minutes between sunrise and sunset
             for(int current_minute = sunrise_minute; 
@@ -195,22 +190,19 @@ NumericVector calculate_solar_potential_cpp(NumericMatrix coords,
                             size_t point_idx = batch[b];
                             
                             double irr = irr_calc.getIrradiance(batch_points[b], illuminated_batch[b]);
-                            float sunny_hours = (float)(minute_step) / 60.0;
+                            float sunny_hours = static_cast<float>(minute_step) / 60.0f;
                             
                             // Thread-safe accumulation
+#ifdef _OPENMP
                             #pragma omp atomic
+#endif
                             solar_potential[point_idx] += irr * sunny_hours * day_step;
                         }
                     }
                 }
             }
         }
-    } // End parallel region
-    
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    
-    // Rcpp::Rcout << "Solar potential calculation completed in " << duration.count() << " ms" << std::endl;
+    }
     
     return solar_potential;
 }

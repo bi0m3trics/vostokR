@@ -68,6 +68,11 @@ This update implements comprehensive parallelization and performance optimizatio
 • Fixed terra plot warnings by using correct `plg` parameter for legend configuration
 • Removed legacy standalone application code (main.cpp, ProjectConfig, SimpleTextPointCloud, OctreeRaycaster)
 • Cleaned up unused dependencies and includes for better build reliability
+• Fixed CRAN M1mac installation failure by guarding `omp.h` includes when OpenMP is unavailable
+• Switched Windows OpenMP build flags to `$(SHLIB_OPENMP_CXXFLAGS)` for CRAN-compliant toolchain portability
+• Fixed explicit float/int narrowing conversion warnings in `rcpp_interface.cpp` (lat/lon/timezone cast to float; sretr/ssetr cast to int; `60.0f` literal)
+• Removed unused `duration`/`start_time` variables in `rcpp_interface.cpp`
+• Fixed Eigen `Index`→`int` narrowing warnings in both functions in `add_normals_fast.cpp`
 
 ---
 

@@ -1,7 +1,7 @@
 Package: vostokR
 Type: Package
 Title: Solar Potential Calculation for Point Clouds using 'VOSTOK'
-Version: 0.2.0
+Version: 0.2.1
 Date: 2026-02-18
 Authors@R: c(
     person("Andrew J.", "Sanchez Meador", 
@@ -39,4 +39,4 @@ LinkingTo:
     RcppEigen
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3
-SystemRequirements: C++17
+SystemRequirements: C++17, OpenMP (optional)

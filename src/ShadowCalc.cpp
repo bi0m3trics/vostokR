@@ -9,7 +9,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 #include <stack>
 #include <vector>
 #include <Rcpp.h>

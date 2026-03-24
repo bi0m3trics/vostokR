@@ -1,8 +1,8 @@
 CXX_STD = CXX17
 
 PKG_CPPFLAGS = -I. -Ioctree -Isolpos -DARMA_USE_OPENMP
-PKG_CXXFLAGS = -fopenmp
-PKG_LIBS = -fopenmp -lgomp
+PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS)
 
 OBJECTS = RcppExports.o \
           rcpp_interface.o \
