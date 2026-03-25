@@ -2,7 +2,7 @@ Package: vostokR
 Type: Package
 Title: Solar Potential Calculation for Point Clouds using 'VOSTOK'
 Version: 0.2.1
-Date: 2026-02-18
+Date: 2026-03-25
 Authors@R: c(
     person("Andrew J.", "Sanchez Meador", 
            email = "andrew.sanchezmeador@nau.edu", 
