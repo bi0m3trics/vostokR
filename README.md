@@ -1,6 +1,10 @@
 <img src="https://github.com/bi0m3trics/vostokR/blob/main/images/header.png" alt="header" width="2000" height="512"/>
 
 ## vostokR: Solar Potential Calculation for LiDAR Point Clouds using VOSTOK
+[![](https://www.r-pkg.org/badges/version/vostokR)](https://cran.r-project.org/package=vostokR)
+![R](https://img.shields.io/badge/R-%3E%3D4.3-blue)
+[![DOI](https://img.shields.io/badge/10.32614/CRAN.package.vostokR-blue)](10.32614/CRAN.package.vostokR)
+![license](https://img.shields.io/badge/Licence-GPL--3-blue.svg) 
 
 <img src="https://github.com/bi0m3trics/vostokR/blob/main/images/vostokR_SummaryOverview.png" alt="header" align="right" width="100%"/> vostokR provides an R interface to the VOSTOK (Voxel Octree Solar Toolkit) algorithm for calculating solar potential on LiDAR point clouds. This package uses the original C++ implementation by Bechtold and Höfle (2020) to perform efficient ray casting and solar position calculations, computing solar irradiance for each point while accounting for shadowing effects from surrounding points.
 
@@ -183,4 +187,4 @@ This package exists thanks to an unexpected two-week window created by a bout of
 
 ## License
 
-This package is licensed under the GPL (\>= 2) license.
+This package is licensed under the GPL (\>= 3) license.
