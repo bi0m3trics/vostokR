@@ -1,4 +1,6 @@
 # vostokR News
+## vostokR v0.2.1 live on CRAN (Release date: 2026-03-25)
+Slight tweaks for CRAN M1 mac fix and Windows OpenMP toolchain change. These changes improve portability and silence compiler warnings. 
 
 ## vostokR v0.2.0 (Release date: 2025-09-01)
 
